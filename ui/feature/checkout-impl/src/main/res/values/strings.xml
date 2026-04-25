@@ -1,0 +1,19 @@
+<resources>
+    <string name="checkout_title">Checkout</string>
+    <string name="order_type">Order Type</string>
+    <string name="pickup">Pickup</string>
+    <string name="delivery">Delivery</string>
+    <string name="delivery_address">Delivery Address</string>
+    <string name="delivery_fee">Delivery fee: %1$s</string>
+    <string name="delivery_fee_label">Delivery Fee</string>
+    <string name="order_summary">Order Summary</string>
+    <string name="order_notes">Order Notes</string>
+    <string name="notes_placeholder">Add a note to your order (optional)</string>
+    <string name="cash_payment">Cash Payment</string>
+    <string name="cash_payment_desc">Payment is cash on %1$s</string>
+    <string name="payment_on_delivery">delivery</string>
+    <string name="payment_on_pickup">pickup</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="total">Total</string>
+    <string name="place_order">Place Order • %1$s</string>
+</resources>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="home_title">ابن الشام</string>
+    <string name="notifications">التنبيهات</string>
+    <string name="categories">الفئات</string>
+    <string name="show_as_grid">عرض كالشبكة</string>
+    <string name="show_as_tabs">عرض كتبويبات</string>
+    <string name="no_products_category">لا يوجد منتجات في هذه الفئة</string>
+    <string name="search_placeholder">ابحث عن منتجات…</string>
+    <string name="view_all">عرض الكل</string>
+</resources>

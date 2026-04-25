@@ -1,0 +1,28 @@
+<resources>
+    <string name="orders_title">طلباتي</string>
+    <string name="tab_current">الحالية</string>
+    <string name="tab_previous">السابقة</string>
+    <string name="no_orders">لا يوجد طلبات حالياً</string>
+    <string name="tracking_title">تتبع الطلب</string>
+    <string name="phase_waiting">جاري مراجعة طلبك...</string>
+    <string name="phase_waiting_desc">فريقنا يقوم بمراجعة تفاصيل طلبك.\nلحظات من فضلك! 🍽️</string>
+    <string name="phase_confirmed">تم تأكيد الطلب!</string>
+    <string name="phase_confirmed_desc">تم تأكيد طلبك بنجاح.\nيمكنك الإلغاء خلال الدقائق القليلة القادمة.</string>
+    <string name="phase_processing">طلبك قيد التحضير!</string>
+    <string name="phase_processing_desc">الشيف يقوم بتحضير وجبتك اللذيذة 🍽️</string>
+    <string name="estimated_time">الوقت المتوقع: ~%1$d دقيقة</string>
+    <string name="delivery_check_title">هل وصل طلبك؟</string>
+    <string name="delivery_check_desc">يرجى التأكيد عند استلام الطلب</string>
+    <string name="confirm_received">نعم، استلمته! ✅</string>
+    <string name="phase_delivered">تم توصيل الطلب!</string>
+    <string name="rate_experience">يرجى تقييم تجربتك</string>
+    <string name="thank_you">شكراً لك!</string>
+    <string name="order_complete">اكتمل طلبك</string>
+    <string name="back_to_orders">العودة للطلبات</string>
+    <string name="rate_order">تقييم الطلب</string>
+    <string name="how_experience">كيف كانت تجربتك؟</string>
+    <string name="skip">تخطي</string>
+    <string name="submit">إرسال</string>
+    <string name="cancel_order">إلغاء الطلب</string>
+    <string name="order_notes_placeholder">أضف ملاحظة (اختياري)</string>
+</resources>

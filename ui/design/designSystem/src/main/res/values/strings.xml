@@ -1,0 +1,15 @@
+<resources>
+    <string name="back">Back</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="error">Error</string>
+    <string name="loading">Loading...</string>
+    <string name="retry">Retry</string>
+    <string name="jod">JOD</string>
+    <string name="currency_symbol">JOD</string>
+    <string name="view_cart">View Cart</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_menu">Menu</string>
+    <string name="nav_orders">Orders</string>
+    <string name="nav_more">More</string>
+</resources>

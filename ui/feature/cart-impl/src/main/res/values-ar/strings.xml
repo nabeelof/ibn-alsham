@@ -1,0 +1,9 @@
+<resources>
+    <string name="cart_title">سلتي</string>
+    <string name="clear">مسح</string>
+    <string name="empty_cart_title">سلتك فارغة</string>
+    <string name="empty_cart_desc">يبدو أنك لم تضف أي شيء إلى سلتك بعد</string>
+    <string name="start_shopping">ابدأ التسوق</string>
+    <string name="total">المجموع</string>
+    <string name="proceed_checkout">المتابعة للدفع</string>
+</resources>

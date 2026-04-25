@@ -1,0 +1,352 @@
+# Active eCommerce CMS Parity Spec (Draft)
+
+This file is auto-generated from Flutter `source_code` repositories and current IbnAlsham backend routes.
+It is the Phase 0 parity mapping baseline.
+
+## Current Backend API Routes (IbnAlsham)
+- `DELETE /profile`
+- `GET /categories`
+- `GET /favorites`
+- `GET /home`
+- `GET /notifications`
+- `GET /notifications/unread-count`
+- `GET /orders`
+- `GET /orders/{order}`
+- `GET /products`
+- `GET /products/{product}`
+- `GET /profile`
+- `POST /auth/logout`
+- `POST /delivery/calculate`
+- `POST /guest`
+- `POST /notifications/mark-all-read`
+- `POST /orders`
+- `POST /orders/{order}/cancel`
+- `POST /orders/{order}/reorder`
+- `POST /products/{product}/favorite`
+- `POST /register`
+- `POST /send-otp`
+- `POST /verify-otp`
+- `PUT /profile`
+
+## Flutter Source API Endpoints (Active eCommerce CMS)
+- `/addon-list`  (from addons_repository.dart)
+- `/all-brands`  (from brand_repository.dart)
+- `/all-notification`  (from notification_repository.dart)
+- `/areas-by-city/$city_id?name=$name`  (from address_repository.dart)
+- `/auction/bided-products?page=$page`  (from auction_products_repository.dart)
+- `/auction/place-bid`  (from auction_products_repository.dart)
+- `/auction/products/$slug`  (from auction_products_repository.dart)
+- `/auction/products?page=$page`  (from auction_products_repository.dart)
+- `/auction/purchase-history?page=$page&payment_status=$payment_status&delivery_status=$delivery_status`  (from auction_products_repository.dart)
+- `/auth/account-deletion`  (from auth_repository.dart)
+- `/auth/confirm_code`  (from auth_repository.dart)
+- `/auth/info`  (from auth_repository.dart)
+- `/auth/login`  (from auth_repository.dart)
+- `/auth/logout`  (from auth_repository.dart)
+- `/auth/password/confirm_reset`  (from auth_repository.dart)
+- `/auth/password/forget_request`  (from auth_repository.dart)
+- `/auth/password/resend_code`  (from auth_repository.dart)
+- `/auth/resend_code`  (from auth_repository.dart)
+- `/auth/signup`  (from auth_repository.dart)
+- `/auth/social-login`  (from auth_repository.dart)
+- `/banners-one`  (from sliders_repository.dart)
+- `/banners-three`  (from sliders_repository.dart)
+- `/banners-two`  (from sliders_repository.dart)
+- `/bkash/api/success`  (from payment_repository.dart)
+- `/bkash/begin?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId}`  (from payment_repository.dart)
+- `/brands`  (from brand_repository.dart)
+- `/business-settings`  (from business_setting_repository.dart)
+- `/cart-count`  (from cart_repository.dart)
+- `/cart-summary`  (from cart_repository.dart)
+- `/carts`  (from cart_repository.dart)
+- `/carts/$cartId`  (from cart_repository.dart)
+- `/carts/add`  (from cart_repository.dart)
+- `/carts/process`  (from cart_repository.dart)
+- `/categories/featured`  (from category_repository.dart)
+- `/categories/top`  (from category_repository.dart)
+- `/categories?parent_id=$parent_id`  (from category_repository.dart)
+- `/category/info/$slug`  (from category_repository.dart)
+- `/chat/conversations?page=$page`  (from chat_repository.dart)
+- `/chat/create-conversation`  (from chat_repository.dart)
+- `/chat/get-new-messages/$conversation_id/$last_message_id`  (from chat_repository.dart)
+- `/chat/insert-message`  (from chat_repository.dart)
+- `/chat/messages/$conversation_id?page=$page`  (from chat_repository.dart)
+- `/cities-by-country/$country_id?name=$name`  (from address_repository.dart)
+- `/cities-by-state/$state_id?name=$name`  (from address_repository.dart)
+- `/classified/all?page=$page`  (from classified_product_repository.dart)
+- `/classified/change-status/$id`  (from classified_product_repository.dart)
+- `/classified/delete/$id`  (from classified_product_repository.dart)
+- `/classified/own-products?page=$page`  (from classified_product_repository.dart)
+- `/classified/product-details/$slug`  (from classified_product_repository.dart)
+- `/classified/related-products/$slug`  (from classified_product_repository.dart)
+- `/classified/store`  (from classified_product_repository.dart)
+- `/classified/update/$id?lang=$lang`  (from classified_product_repository.dart)
+- `/clubpoint/convert-into-wallet`  (from clubpoint_repository.dart)
+- `/clubpoint/get-list?page=$page`  (from clubpoint_repository.dart)
+- `/countries?name=$name`  (from address_repository.dart)
+- `/coupon-apply`  (from coupon_repository.dart)
+- `/coupon-list?page=$page`  (from coupon_repository.dart)
+- `/coupon-products/$id`  (from coupon_repository.dart)
+- `/coupon-remove`  (from coupon_repository.dart)
+- `/currencies`  (from currency_repository.dart)
+- `/customer-packages`  (from customer_package_repository.dart)
+- `/customer/info`  (from profile_repository.dart)
+- `/delivery-info`  (from shipping_repository.dart)
+- `/digital/purchased-list?page=$page`  (from order_repository.dart)
+- `/file/all?page=$page&search=$search&type=$type&sort=$sort`  (from upload_repository.dart)
+- `/file/delete/$id`  (from upload_repository.dart)
+- `/file/image-upload`  (from file_repository.dart)
+- `/file/upload`  (from upload_repository.dart)
+- `/filter/brands`  (from brand_repository.dart)
+- `/filter/categories`  (from category_repository.dart)
+- `/flash-deal-products/$id`  (from product_repository.dart)
+- `/flash-deals`  (from flash_deal_repository.dart, sliders_repository.dart)
+- `/flash-deals-banners`  (from sliders_repository.dart)
+- `/flash-deals/info/$slug`  (from flash_deal_repository.dart)
+- `/flutterwave/payment/url?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`  (from payment_repository.dart)
+- `/followed-seller/check/$id`  (from shop_repository.dart)
+- `/followed-seller/remove/$id`  (from shop_repository.dart)
+- `/followed-seller/store/$id`  (from shop_repository.dart)
+- `/followed-seller?page=$page`  (from shop_repository.dart)
+- `/free/packages-payment`  (from customer_package_repository.dart)
+- `/get-home-delivery-address`  (from address_repository.dart)
+- `/get-search-suggestions?query_key=$query_key&type=$type`  (from search_repository.dart)
+- `/guest-customer-info-check`  (from guest_checkout_repository.dart)
+- `/guest-user-account-create`  (from guest_checkout_repository.dart)
+- `/languages`  (from language_repository.dart)
+- `/nagad/begin?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`  (from payment_repository.dart)
+- `/nagad/process`  (from payment_repository.dart)
+- `/notifications/bulk-delete`  (from notification_repository.dart)
+- `/offline/packages-payment`  (from customer_package_repository.dart)
+- `/offline/payment/submit`  (from offline_payment_repository.dart)
+- `/order/cancel/$id`  (from order_repository.dart)
+- `/order/store`  (from payment_repository.dart)
+- `/payment-types?mode=$mode&list=$list`  (from payment_repository.dart)
+- `/payments/pay/cod`  (from payment_repository.dart)
+- `/payments/pay/manual`  (from payment_repository.dart)
+- `/payments/pay/wallet`  (from payment_repository.dart)
+- `/paypal/payment/url?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`  (from payment_repository.dart)
+- `/paystack/success`  (from payment_repository.dart)
+- `/pickup-list`  (from pickup_points_repository.dart)
+- `/products/$id`  (from product_repository.dart)
+- `/products/$slug/$userId`  (from product_repository.dart)
+- `/products/best-seller`  (from product_repository.dart)
+- `/products/brand/$slug?page=$page&name=$name`  (from product_repository.dart)
+- `/products/category/$id?page=${page}&name=${name}`  (from product_repository.dart)
+- `/products/featured?page=$page`  (from product_repository.dart)
+- `/products/frequently-bought/$slug`  (from product_repository.dart)
+- `/products/inhouse?page=$page`  (from product_repository.dart)
+- `/products/last-viewed`  (from product_repository.dart)
+- `/products/search`  (from product_repository.dart)
+- `/products/search?page=1&name=$name&sort_key=$sort_key&brands=$brands&categories=&min=$min&max=$max&digital=$page`  (from product_repository.dart)
+- `/products/seller/$id?page=${page}&name=${name}`  (from product_repository.dart)
+- `/products/todays-deal`  (from product_repository.dart)
+- `/products/top-from-seller/$slug`  (from product_repository.dart)
+- `/products/variant/price`  (from product_repository.dart)
+- `/profile/check-phone-and-email`  (from profile_repository.dart)
+- `/profile/counters`  (from profile_repository.dart)
+- `/profile/update`  (from profile_repository.dart)
+- `/profile/update-device-token`  (from profile_repository.dart)
+- `/profile/update-image`  (from profile_repository.dart)
+- `/purchase-history`  (from order_repository.dart)
+- `/purchase-history-details/$id`  (from order_repository.dart)
+- `/purchase-history-items/$id`  (from order_repository.dart)
+- `/razorpay/success`  (from payment_repository.dart)
+- `/re-order/$id`  (from order_repository.dart)
+- `/refund-request/get-list?page=$page`  (from refund_request_repository.dart)
+- `/refund-request/send`  (from refund_request_repository.dart)
+- `/reviews/product/$productId?page=$page`  (from review_repositories.dart)
+- `/reviews/submit`  (from review_repositories.dart)
+- `/seller/products/categories`  (from product_repository.dart)
+- `/seller/top`  (from shop_repository.dart)
+- `/shipping_cost`  (from address_repository.dart)
+- `/shops`  (from shop_repository.dart)
+- `/shops/details/$slug`  (from shop_repository.dart)
+- `/shops/products/featured/$id`  (from shop_repository.dart)
+- `/shops/products/new/$id`  (from shop_repository.dart)
+- `/shops/products/top/$id`  (from shop_repository.dart)
+- `/sliders`  (from sliders_repository.dart)
+- `/sslcommerz/begin?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`  (from payment_repository.dart)
+- `/states-by-country/$country_id?name=$name`  (from address_repository.dart)
+- `/unread-notifications`  (from notification_repository.dart)
+- `/update-address-in-cart`  (from address_repository.dart)
+- `/update-shipping-type-in-cart`  (from address_repository.dart)
+- `/user/shipping/address`  (from address_repository.dart)
+- `/user/shipping/create`  (from address_repository.dart)
+- `/user/shipping/delete/$id`  (from address_repository.dart)
+- `/user/shipping/make_default`  (from address_repository.dart)
+- `/user/shipping/update`  (from address_repository.dart)
+- `/user/shipping/update-location`  (from address_repository.dart)
+- `/varient-price`  (from product_repository.dart)
+- `/wallet/balance`  (from wallet_repository.dart)
+- `/wallet/history?page=$page`  (from wallet_repository.dart)
+- `/wallet/offline-recharge`  (from offline_wallet_recharge_repository.dart)
+- `/wholesale/all-products`  (from product_repository.dart)
+- `/wishlists`  (from wishlist_repository.dart)
+- `/wishlists-add-product/$product_slug`  (from wishlist_repository.dart)
+- `/wishlists-check-product/$product_slug`  (from wishlist_repository.dart)
+- `/wishlists-remove-product/$product_slug`  (from wishlist_repository.dart)
+- `/wishlists/$wishlist_id`  (from wishlist_repository.dart)
+
+## Gap List (Flutter endpoints missing in backend)
+- `/addon-list`
+- `/all-brands`
+- `/all-notification`
+- `/areas-by-city/$city_id?name=$name`
+- `/auction/bided-products?page=$page`
+- `/auction/place-bid`
+- `/auction/products/$slug`
+- `/auction/products?page=$page`
+- `/auction/purchase-history?page=$page&payment_status=$payment_status&delivery_status=$delivery_status`
+- `/auth/account-deletion`
+- `/auth/confirm_code`
+- `/auth/info`
+- `/auth/login`
+- `/auth/password/confirm_reset`
+- `/auth/password/forget_request`
+- `/auth/password/resend_code`
+- `/auth/resend_code`
+- `/auth/signup`
+- `/auth/social-login`
+- `/banners-one`
+- `/banners-three`
+- `/banners-two`
+- `/bkash/api/success`
+- `/bkash/begin?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId}`
+- `/brands`
+- `/business-settings`
+- `/cart-count`
+- `/cart-summary`
+- `/carts`
+- `/carts/$cartId`
+- `/carts/add`
+- `/carts/process`
+- `/categories/featured`
+- `/categories/top`
+- `/categories?parent_id=$parent_id`
+- `/category/info/$slug`
+- `/chat/conversations?page=$page`
+- `/chat/create-conversation`
+- `/chat/get-new-messages/$conversation_id/$last_message_id`
+- `/chat/insert-message`
+- `/chat/messages/$conversation_id?page=$page`
+- `/cities-by-country/$country_id?name=$name`
+- `/cities-by-state/$state_id?name=$name`
+- `/classified/all?page=$page`
+- `/classified/change-status/$id`
+- `/classified/delete/$id`
+- `/classified/own-products?page=$page`
+- `/classified/product-details/$slug`
+- `/classified/related-products/$slug`
+- `/classified/store`
+- `/classified/update/$id?lang=$lang`
+- `/clubpoint/convert-into-wallet`
+- `/clubpoint/get-list?page=$page`
+- `/countries?name=$name`
+- `/coupon-apply`
+- `/coupon-list?page=$page`
+- `/coupon-products/$id`
+- `/coupon-remove`
+- `/currencies`
+- `/customer-packages`
+- `/customer/info`
+- `/delivery-info`
+- `/digital/purchased-list?page=$page`
+- `/file/all?page=$page&search=$search&type=$type&sort=$sort`
+- `/file/delete/$id`
+- `/file/image-upload`
+- `/file/upload`
+- `/filter/brands`
+- `/filter/categories`
+- `/flash-deal-products/$id`
+- `/flash-deals`
+- `/flash-deals-banners`
+- `/flash-deals/info/$slug`
+- `/flutterwave/payment/url?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`
+- `/followed-seller/check/$id`
+- `/followed-seller/remove/$id`
+- `/followed-seller/store/$id`
+- `/followed-seller?page=$page`
+- `/free/packages-payment`
+- `/get-home-delivery-address`
+- `/get-search-suggestions?query_key=$query_key&type=$type`
+- `/guest-customer-info-check`
+- `/guest-user-account-create`
+- `/languages`
+- `/nagad/begin?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`
+- `/nagad/process`
+- `/notifications/bulk-delete`
+- `/offline/packages-payment`
+- `/offline/payment/submit`
+- `/order/cancel/$id`
+- `/order/store`
+- `/payment-types?mode=$mode&list=$list`
+- `/payments/pay/cod`
+- `/payments/pay/manual`
+- `/payments/pay/wallet`
+- `/paypal/payment/url?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`
+- `/paystack/success`
+- `/pickup-list`
+- `/products/$id`
+- `/products/$slug/$userId`
+- `/products/best-seller`
+- `/products/brand/$slug?page=$page&name=$name`
+- `/products/category/$id?page=${page}&name=${name}`
+- `/products/featured?page=$page`
+- `/products/frequently-bought/$slug`
+- `/products/inhouse?page=$page`
+- `/products/last-viewed`
+- `/products/search`
+- `/products/search?page=1&name=$name&sort_key=$sort_key&brands=$brands&categories=&min=$min&max=$max&digital=$page`
+- `/products/seller/$id?page=${page}&name=${name}`
+- `/products/todays-deal`
+- `/products/top-from-seller/$slug`
+- `/products/variant/price`
+- `/profile/check-phone-and-email`
+- `/profile/counters`
+- `/profile/update`
+- `/profile/update-device-token`
+- `/profile/update-image`
+- `/purchase-history`
+- `/purchase-history-details/$id`
+- `/purchase-history-items/$id`
+- `/razorpay/success`
+- `/re-order/$id`
+- `/refund-request/get-list?page=$page`
+- `/refund-request/send`
+- `/reviews/product/$productId?page=$page`
+- `/reviews/submit`
+- `/seller/products/categories`
+- `/seller/top`
+- `/shipping_cost`
+- `/shops`
+- `/shops/details/$slug`
+- `/shops/products/featured/$id`
+- `/shops/products/new/$id`
+- `/shops/products/top/$id`
+- `/sliders`
+- `/sslcommerz/begin?payment_type=$paymentType&combined_order_id=$combinedOrderId&amount=$amount&user_id=${user_id.$}&package_id=$packageId&order_id=$orderId`
+- `/states-by-country/$country_id?name=$name`
+- `/unread-notifications`
+- `/update-address-in-cart`
+- `/update-shipping-type-in-cart`
+- `/user/shipping/address`
+- `/user/shipping/create`
+- `/user/shipping/delete/$id`
+- `/user/shipping/make_default`
+- `/user/shipping/update`
+- `/user/shipping/update-location`
+- `/varient-price`
+- `/wallet/balance`
+- `/wallet/history?page=$page`
+- `/wallet/offline-recharge`
+- `/wholesale/all-products`
+- `/wishlists`
+- `/wishlists-add-product/$product_slug`
+- `/wishlists-check-product/$product_slug`
+- `/wishlists-remove-product/$product_slug`
+- `/wishlists/$wishlist_id`
+
+## Notes
+- Methods/verbs are not captured from Flutter code in this draft; review repositories to assign `GET/POST/PUT/DELETE`.
+- This list will be refined into a formal API contract per module (catalog, cart, checkout, etc.).

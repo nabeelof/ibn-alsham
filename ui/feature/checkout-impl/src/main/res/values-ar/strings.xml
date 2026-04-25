@@ -1,0 +1,19 @@
+<resources>
+    <string name="checkout_title">إتمام الطلب</string>
+    <string name="order_type">نوع الطلب</string>
+    <string name="pickup">استلام من الفرع</string>
+    <string name="delivery">توصيل</string>
+    <string name="delivery_address">عنوان التوصيل</string>
+    <string name="delivery_fee">رسوم التوصيل: %1$s</string>
+    <string name="delivery_fee_label">رسوم التوصيل</string>
+    <string name="order_summary">ملخص الطلب</string>
+    <string name="order_notes">ملاحظات الطلب</string>
+    <string name="notes_placeholder">أضف ملاحظة لطلبك (اختياري)</string>
+    <string name="cash_payment">الدفع نقداً</string>
+    <string name="cash_payment_desc">الدفع نقداً عند %1$s</string>
+    <string name="payment_on_delivery">التوصيل</string>
+    <string name="payment_on_pickup">الاستلام</string>
+    <string name="subtotal">المجموع الفرعي</string>
+    <string name="total">المجموع الكلي</string>
+    <string name="place_order">تأكيد الطلب • %1$s</string>
+</resources>

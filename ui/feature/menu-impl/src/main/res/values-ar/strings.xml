@@ -1,0 +1,8 @@
+<resources>
+    <string name="menu_title">القائمة</string>
+    <string name="toggle_view">تغيير العرض</string>
+    <string name="cart_summary">%1$d أصناف • %2$s</string>
+    <string name="details">التفاصيل</string>
+    <string name="add">إضافة</string>
+    <string name="items_count">%d أصناف</string>
+</resources>

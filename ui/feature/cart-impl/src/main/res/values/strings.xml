@@ -1,0 +1,9 @@
+<resources>
+    <string name="cart_title">My Cart</string>
+    <string name="clear">Clear</string>
+    <string name="empty_cart_title">Your cart is empty</string>
+    <string name="empty_cart_desc">Looks like you haven’t added anything to your cart yet</string>
+    <string name="start_shopping">Start Shopping</string>
+    <string name="total">Total</string>
+    <string name="proceed_checkout">Proceed to Checkout</string>
+</resources>
