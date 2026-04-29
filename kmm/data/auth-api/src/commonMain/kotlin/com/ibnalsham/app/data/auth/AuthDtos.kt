@@ -11,13 +11,13 @@ data class SendOtpRequestDto(
 @Serializable
 data class VerifyOtpRequestDto(
     @SerialName("phone") val phone: String,
-    @SerialName("code") val code: String
+    @SerialName("otp") val otp: String
 )
 
 @Serializable
 data class RegisterRequestDto(
     @SerialName("phone") val phone: String,
-    @SerialName("code") val code: String,
+    @SerialName("otp") val otp: String,
     @SerialName("name") val name: String
 )
 

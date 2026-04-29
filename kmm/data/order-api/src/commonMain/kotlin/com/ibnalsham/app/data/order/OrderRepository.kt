@@ -5,11 +5,14 @@ import com.ibnalsham.app.library.data.network.BaseResponse
 import com.ibnalsham.app.data.network.error.DomainError
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -66,6 +69,14 @@ class NetworkOrderRepository(
             } else {
                 AppResult.Failure(DomainError.Unknown(response.message ?: "Failed to place order"))
             }
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.Unauthorized) {
+                AppResult.Failure(DomainError.Unauthorized)
+            } else {
+                AppResult.Failure(DomainError.Unknown("Request failed: ${e.response.status.value}"))
+            }
+        } catch (e: ServerResponseException) {
+            AppResult.Failure(DomainError.ServerError)
         } catch (e: Exception) {
             AppResult.Failure(DomainError.NetworkError)
         }

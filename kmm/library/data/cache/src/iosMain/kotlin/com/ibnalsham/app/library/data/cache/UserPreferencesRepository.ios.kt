@@ -23,9 +23,39 @@ actual class InMemoryUserPreferencesRepository actual constructor() : UserPrefer
         defaults.setBool(enabled, forKey = KEY_HOME_CATEGORIES_AS_TABS)
     }
 
+    override fun getAuthToken(): String? = defaults.stringForKey(KEY_AUTH_TOKEN)
+
+    override fun saveAuthToken(token: String) {
+        defaults.setObject(token, forKey = KEY_AUTH_TOKEN)
+    }
+
+    override fun clearAuthToken() {
+        defaults.removeObjectForKey(KEY_AUTH_TOKEN)
+    }
+
+    override fun getUserName(): String? = defaults.stringForKey(KEY_USER_NAME)
+
+    override fun saveUserName(name: String) {
+        defaults.setObject(name, forKey = KEY_USER_NAME)
+    }
+
+    override fun getUserPhone(): String? = defaults.stringForKey(KEY_USER_PHONE)
+
+    override fun saveUserPhone(phone: String) {
+        defaults.setObject(phone, forKey = KEY_USER_PHONE)
+    }
+
+    override fun clearUserIdentity() {
+        defaults.removeObjectForKey(KEY_USER_NAME)
+        defaults.removeObjectForKey(KEY_USER_PHONE)
+    }
+
     private companion object {
         const val KEY_VIEW_TYPE = "view_type"
         const val KEY_HOME_CATEGORIES_AS_TABS = "home_categories_as_tabs"
+        const val KEY_AUTH_TOKEN = "auth_token"
+        const val KEY_USER_NAME = "user_name"
+        const val KEY_USER_PHONE = "user_phone"
         const val DEFAULT_VIEW_TYPE = "GRID"
         const val DEFAULT_HOME_CATEGORIES_AS_TABS = false
     }

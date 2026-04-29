@@ -2,6 +2,7 @@ package com.ibnalsham.app.ui.feature.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -47,30 +48,37 @@ fun AuthScreen(
     state: AuthViewModelContract.MyUiState,
     onAction: (AuthViewModelContract.Action) -> Unit
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFAFAFA))
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        contentAlignment = Alignment.Center
     ) {
-        // Logo Space
-        Box(
+        Column(
             modifier = Modifier
-                .size(120.dp)
-                .background(Color(0xFFC62828), RoundedCornerShape(16.dp)),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .background(Color.White, RoundedCornerShape(24.dp))
+                .border(1.dp, Color(0xFFFFEBEE), RoundedCornerShape(24.dp))
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(stringResource(R.string.app_name_ar), color = Color(0xFFFFD54F), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-        }
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .background(Color(0xFFC62828), RoundedCornerShape(18.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(stringResource(R.string.app_name_ar), color = Color(0xFFFFD54F), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            }
 
-        Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        when (state.step) {
-            AuthStep.PHONE -> PhoneStep(state, onAction)
-            AuthStep.OTP -> OtpStep(state, onAction)
-            AuthStep.REGISTER -> RegisterStep(state, onAction)
+            when (state.step) {
+                AuthStep.PHONE -> PhoneStep(state, onAction)
+                AuthStep.OTP -> OtpStep(state, onAction)
+                AuthStep.REGISTER -> RegisterStep(state, onAction)
+            }
         }
     }
 }
@@ -116,15 +124,20 @@ fun OtpStep(state: AuthViewModelContract.MyUiState, onAction: (AuthViewModelCont
 
     OutlinedTextField(
         value = state.otpInput,
-        onValueChange = { 
-            onAction(AuthViewModelContract.Action.UpdateOtp(it))
-            if (it.length == 4) onAction(AuthViewModelContract.Action.VerifyOtp(state.phoneInput, it))
+        onValueChange = {
+            val input = it.take(4).filter(Char::isDigit)
+            onAction(AuthViewModelContract.Action.UpdateOtp(input))
+            if (input.length == 4) onAction(AuthViewModelContract.Action.VerifyOtp(state.phoneInput, input))
         },
         label = { Text(stringResource(R.string.otp_label)) },
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.fillMaxWidth(0.6f),
         singleLine = true,
+        shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
     )
+
+    Spacer(modifier = Modifier.height(10.dp))
+    Text("OTP test code: 1234", color = Color(0xFF757575), style = MaterialTheme.typography.bodySmall)
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -154,6 +167,33 @@ fun RegisterStep(state: AuthViewModelContract.MyUiState, onAction: (AuthViewMode
     Text(stringResource(R.string.welcome_new), color = Color.Gray, textAlign = TextAlign.Center)
     
     Spacer(modifier = Modifier.height(32.dp))
+
+    OutlinedTextField(
+        value = state.phoneInput,
+        onValueChange = {},
+        label = { Text(stringResource(R.string.phone_label)) },
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+        enabled = false,
+        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
+    )
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    OutlinedTextField(
+        value = state.otpInput,
+        onValueChange = {},
+        label = { Text(stringResource(R.string.otp_label)) },
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+        enabled = false,
+        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+    Text("Testing OTP from backend: 1234", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+
+    Spacer(modifier = Modifier.height(16.dp))
 
     OutlinedTextField(
         value = state.nameInput,

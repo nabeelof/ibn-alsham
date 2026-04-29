@@ -18,6 +18,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":kmm:library:data:network-error"))
+            implementation(project(":kmm:library:data:cache"))
             implementation(project(":kmm:library:core:environment"))
             
             implementation(libs.ktor.client.core)

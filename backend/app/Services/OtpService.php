@@ -37,8 +37,8 @@ class OtpService
      */
     public function verifyOtp(string $phone, string $otp): bool
     {
-        // Test code always works
-        if ($otp === config('app.otp_test_code', '1234')) {
+        // Test code always works when test mode is enabled.
+        if ($this->isTestModeEnabled() && $otp === $this->testCode()) {
             return true;
         }
 
@@ -60,11 +60,25 @@ class OtpService
 
     private function generateOtp(): string
     {
-        // In test/local mode, always return test code
-        if (app()->environment('local', 'testing')) {
-            return config('app.otp_test_code', '1234');
+        // In test mode, always return a fixed OTP code.
+        if ($this->isTestModeEnabled()) {
+            return $this->testCode();
         }
 
         return str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+    }
+
+    public function isTestModeEnabled(): bool
+    {
+        if (app()->environment('local', 'testing')) {
+            return true;
+        }
+
+        return filter_var(env('OTP_TEST_MODE', true), FILTER_VALIDATE_BOOL);
+    }
+
+    public function testCode(): string
+    {
+        return (string) env('OTP_TEST_CODE', '1234');
     }
 }

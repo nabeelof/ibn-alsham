@@ -182,6 +182,12 @@ fun AppNavigation() {
                             popUpTo(Destination.Home.route) { inclusive = false }
                         }
                     },
+                    onNavigateToAuth = {
+                        navController.navigate(Destination.Auth.route) {
+                            popUpTo(Destination.Home.route) { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    },
                     onNavigateBack = { navController.popBackStack() },
                     onShowSnackbar = showSnackbar
                 )

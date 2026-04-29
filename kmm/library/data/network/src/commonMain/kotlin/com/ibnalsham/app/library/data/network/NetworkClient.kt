@@ -1,6 +1,7 @@
 package com.ibnalsham.app.library.data.network
 
 import com.ibnalsham.app.library.core.environment.EnvironmentConfig
+import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -8,12 +9,16 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-fun createHttpClient(json: Json): HttpClient {
+fun createHttpClient(
+    json: Json,
+    userPreferencesRepository: UserPreferencesRepository,
+): HttpClient {
     return HttpClient {
         install(ContentNegotiation) {
             json(json)
@@ -31,8 +36,12 @@ fun createHttpClient(json: Json): HttpClient {
         defaultRequest {
             url(EnvironmentConfig.current.baseUrl)
             contentType(ContentType.Application.Json)
-            // Default headers - we can add auth tokens here later
             header("Accept", "application/json")
+            userPreferencesRepository.getAuthToken()
+                ?.takeIf { it.isNotBlank() }
+                ?.let { token ->
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                }
         }
     }
 }

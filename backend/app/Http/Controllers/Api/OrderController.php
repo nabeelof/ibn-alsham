@@ -57,6 +57,7 @@ class OrderController extends Controller
 
             return $this->success(
                 $this->formatOrderDetails($order, app()->getLocale()),
+                [],
                 __('orders.created_successfully')
             );
         } catch (\Exception $e) {
@@ -146,7 +147,7 @@ class OrderController extends Controller
 
         $order->cancel($request->input('reason'));
 
-        return $this->success(null, __('orders.cancelled_successfully'));
+        return $this->success(null, [], __('orders.cancelled_successfully'));
     }
 
     /**
@@ -166,7 +167,7 @@ class OrderController extends Controller
 
         $order->confirmDelivery();
 
-        return $this->success(null, 'Delivery confirmed successfully');
+        return $this->success(null, [], 'Delivery confirmed successfully');
     }
 
     /**
@@ -202,7 +203,7 @@ class OrderController extends Controller
             $request->input('review_note')
         );
 
-        return $this->success(null, 'Review submitted successfully');
+        return $this->success(null, [], 'Review submitted successfully');
     }
 
     public function reorder(int $id, Request $request): JsonResponse

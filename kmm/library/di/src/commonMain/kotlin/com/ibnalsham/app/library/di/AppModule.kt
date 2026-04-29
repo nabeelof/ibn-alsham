@@ -49,9 +49,9 @@ import org.koin.dsl.module
 val appModule = module {
     // Infrastructure
     single { networkJson }
-    single { createHttpClient(get()) }
-    single<CartRepository> { InMemoryCartRepository() }
     single<UserPreferencesRepository> { InMemoryUserPreferencesRepository() }
+    single { createHttpClient(get(), get()) }
+    single<CartRepository> { InMemoryCartRepository() }
 
     // Repositories
     single<HomeRepository> { NetworkHomeRepository(get()) }
@@ -73,10 +73,10 @@ val appModule = module {
     // ViewModels
     factory { HomeViewModel(get(), get(), get(), get()) }
     factory { MenuViewModel(get(), get(), get()) }
-    factory { AuthViewModel(get()) }
+    factory { AuthViewModel(get(), get()) }
     factory { CartViewModel(get()) }
     factory { CheckoutViewModel(get(), get()) }
     factory { OrdersViewModel(get()) }
     factory { ProductDetailsViewModel(get()) }
-    factory { MoreViewModel() }
+    factory { MoreViewModel(get()) }
 }

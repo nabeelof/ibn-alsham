@@ -2,11 +2,14 @@ package com.ibnalsham.app.feature.more.presentation.viewModel
 
 import com.ibnalsham.app.presentation.mvi.KMMViewModel
 import com.ibnalsham.app.presentation.mvi.MVI
+import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 import com.ibnalsham.app.presentation.mvi.mvi
-class MoreViewModel : KMMViewModel(), 
+class MoreViewModel(
+    private val userPreferencesRepository: UserPreferencesRepository,
+) : KMMViewModel(),
     MVI<MoreViewModelContract.MyUiState, MoreViewModelContract.Action, MoreViewModelContract.SideEffect> 
     by mvi(MoreViewModelContract.MyUiState.defaultInstance()) {
 
@@ -22,11 +25,14 @@ class MoreViewModel : KMMViewModel(),
     }
 
     private fun loadUserData() {
-        // Fetch from Local user settings cache
+        val token = userPreferencesRepository.getAuthToken()
+        val isLoggedIn = !token.isNullOrBlank()
+        val name = userPreferencesRepository.getUserName().orEmpty().ifBlank { if (isLoggedIn) "User" else "Guest" }
+        val phone = userPreferencesRepository.getUserPhone().orEmpty().ifBlank { if (isLoggedIn) "-" else "Not logged in" }
         updateState { 
             copy(
-                userName = "أحمد محمد",
-                userPhone = "+962 79 123 4567"
+                userName = name,
+                userPhone = phone
             ) 
         }
     }
@@ -34,7 +40,8 @@ class MoreViewModel : KMMViewModel(),
     private fun handleLogout() {
         viewModelScope.launch {
             updateState { copy(isLoggingOut = true) }
-            // Simulate API Logout
+            userPreferencesRepository.clearAuthToken()
+            userPreferencesRepository.clearUserIdentity()
             delay(800)
             navigate(MoreViewModelContract.SideEffect.NavigateToSplash)
         }

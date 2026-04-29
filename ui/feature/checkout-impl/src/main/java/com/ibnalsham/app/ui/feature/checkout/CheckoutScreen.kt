@@ -28,20 +28,33 @@ import com.ibnalsham.app.ui.feature.checkoutimpl.R
 import com.ibnalsham.app.feature.checkout.presentation.viewModel.CheckoutViewModel
 import com.ibnalsham.app.feature.checkout.presentation.viewModel.CheckoutViewModelContract
 import com.ibnalsham.app.feature.checkout.presentation.viewModel.CheckoutViewModelContract.OrderType
+import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 private val BrandRed = Color(0xFFC62828)
 
 @Composable
 fun CheckoutRoute(
     viewModel: CheckoutViewModel = koinViewModel(),
+    userPreferencesRepository: UserPreferencesRepository = koinInject(),
     onNavigateToOrderTracking: (Int) -> Unit,
+    onNavigateToAuth: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     onNavigateBack: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsState()
+    val isLoggedIn = remember { userPreferencesRepository.getAuthToken().isNullOrBlank().not() }
+
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn) {
+            onShowSnackbar("سجّل الدخول لإكمال الطلب")
+            onNavigateToAuth()
+        }
+    }
 
     LaunchedEffect(Unit) {
+        if (!isLoggedIn) return@LaunchedEffect
         viewModel.onAction(CheckoutViewModelContract.Action.ViewReady)
 
         viewModel.sideEffects.collect { effect ->

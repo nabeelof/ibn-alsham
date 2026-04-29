@@ -44,10 +44,16 @@ class AuthController extends Controller
             ['name' => '', 'phone' => $phone]
         );
 
-        $this->otpService->sendOtp($phone);
+        $otp = $this->otpService->sendOtp($phone);
+        $payload = ['phone' => $phone];
+        if ($this->otpService->isTestModeEnabled()) {
+            $payload['otp'] = $otp;
+            $payload['is_test_mode'] = true;
+        }
 
         return $this->success(
-            ['phone' => $phone],
+            $payload,
+            [],
             __('auth.otp_sent')
         );
     }
@@ -144,7 +150,7 @@ class AuthController extends Controller
                 'avatar' => $user->avatar,
             ],
             'is_new_user' => $isNewUser,
-        ], __('auth.login_success'));
+        ], [], __('auth.login_success'));
     }
 
     /**
@@ -195,7 +201,7 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'locale' => $user->locale,
             ],
-        ], __('auth.register_success'));
+        ], [], __('auth.register_success'));
     }
 
     /**
@@ -205,7 +211,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return $this->success(null, __('auth.logout_success'));
+        return $this->success(null, [], __('auth.logout_success'));
     }
 
     public function guestLogin(Request $request): JsonResponse
@@ -226,7 +232,7 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'locale' => $user->locale,
             ],
-        ], 'Guest login');
+        ], [], 'Guest login');
     }
 
     public function guestInfoCheck(Request $request): JsonResponse
@@ -274,6 +280,6 @@ class AuthController extends Controller
         $user = $request->user();
         $user->softDeleteAccount();
 
-        return $this->success(null, __('auth.account_deleted_success'));
+        return $this->success(null, [], __('auth.account_deleted_success'));
     }
 }
