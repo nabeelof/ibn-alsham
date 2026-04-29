@@ -8,12 +8,14 @@ import com.ibnalsham.app.data.menu.MenuRepository
 import com.ibnalsham.app.core.common.onSuccess
 import com.ibnalsham.app.core.common.onFailure
 import com.ibnalsham.app.library.data.cache.CartRepository
+import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
 import com.ibnalsham.app.presentation.mvi.mvi
 import kotlinx.coroutines.flow.collectLatest
 
 class MenuViewModel(
     private val menuRepository: MenuRepository,
     private val cartRepository: CartRepository,
+    private val userPreferences: UserPreferencesRepository,
 ) : KMMViewModel(),
     MVI<MenuViewModelContract.MyUiState, MenuViewModelContract.Action, MenuViewModelContract.SideEffect>
     by mvi(MenuViewModelContract.MyUiState.defaultInstance()) {
@@ -21,6 +23,8 @@ class MenuViewModel(
     override fun onAction(event: MenuViewModelContract.Action) {
         when (event) {
             MenuViewModelContract.Action.ViewReady -> {
+                val savedViewType = ViewType.valueOf(userPreferences.getViewType())
+                updateState { copy(viewType = savedViewType) }
                 loadMenuData()
                 observeCart()
             }
@@ -29,7 +33,10 @@ class MenuViewModel(
             is MenuViewModelContract.Action.ProductClicked -> handleProductClicked(event.productId)
             is MenuViewModelContract.Action.IncreaseQuantity -> handleIncreaseQuantity(event.productId)
             is MenuViewModelContract.Action.DecreaseQuantity -> handleDecreaseQuantity(event.productId)
-            is MenuViewModelContract.Action.ToggleViewType -> updateState { copy(viewType = event.viewType) }
+            is MenuViewModelContract.Action.ToggleViewType -> {
+                updateState { copy(viewType = event.viewType) }
+                userPreferences.saveViewType(event.viewType.name)
+            }
         }
     }
 

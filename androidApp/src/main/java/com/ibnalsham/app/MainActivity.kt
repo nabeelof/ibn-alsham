@@ -96,9 +96,13 @@ fun AppNavigation() {
                             onClick = {
                                 if (currentDestination != route) {
                                     navController.navigate(route) {
-                                        popUpTo(Destination.Home.route) { saveState = true }
+                                        if (route == Destination.Home.route) {
+                                            popUpTo(Destination.Home.route)
+                                        } else {
+                                            popUpTo(Destination.Home.route) { saveState = true }
+                                            restoreState = true
+                                        }
                                         launchSingleTop = true
-                                        restoreState = true
                                     }
                                 }
                             },

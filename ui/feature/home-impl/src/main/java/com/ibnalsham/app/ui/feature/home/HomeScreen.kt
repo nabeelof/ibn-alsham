@@ -1,5 +1,6 @@
 package com.ibnalsham.app.ui.feature.home
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,11 +11,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.ibnalsham.app.feature.domain.BannerDomain
 import com.ibnalsham.app.feature.domain.CategoryDomain
@@ -89,39 +98,97 @@ fun HomeScreen(
     onNavigateToCart: () -> Unit = {},
 ) {
     Scaffold(
-        bottomBar = {
-            CartFloatingBar(
-                itemCount = cartItemCount,
-                subtotal = cartSubtotal,
-                onClick = onNavigateToCart,
-            )
-        },
+        /*floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            Box {
+                FloatingActionButton(
+                    onClick = onNavigateToCart,
+                    containerColor = Color(0xFFC62828),
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.size(64.dp)
+                        .offset(x = 0.dp, y = 32.dp)
+                        .zIndex(5f)
+                ) {
+                    Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", modifier = Modifier.size(28.dp))
+                }
+                if (cartItemCount > 0) {
+                    Surface(
+                        shape = CircleShape,
+                        color = Color.Red,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .align(Alignment.TopStart)
+                            .offset(x = 0.dp, y = 0.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = cartItemCount.toString(),
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        },*/
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         stringResource(R.string.home_title),
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFFE53935), // Premium Red
-                        style = MaterialTheme.typography.titleLarge
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFFC62828), // Premium Red
+                        fontSize = 24.sp
                     )
                 },
-                actions = {
-                    IconButton(onClick = { /* TODO Notifications */ }) {
+                navigationIcon = {
+                    IconButton(onClick = { /* TODO Drawer */ }) {
                         Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = stringResource(R.string.notifications),
-                            tint = Color.DarkGray
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = Color(0xFFC62828)
                         )
+                    }
+                },
+                actions = {
+                    Box{
+                        IconButton(onClick = onNavigateToCart) {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = "Cart",
+                                tint = Color(0xFFC62828)
+                            )
+                        }
+                        if (cartItemCount > 0) {
+                            Surface(
+                                shape = CircleShape,
+                                color = Color.Red,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .align(Alignment.TopStart)
+                                    .offset(x = 0.dp, y = 0.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = cartItemCount.toString(),
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White
                 ),
-                modifier = Modifier.shadow(elevation = 2.dp)
+                modifier = Modifier.shadow(0.dp)
             )
         },
-        containerColor = Color(0xFFF7F8FA) // Very subtle cool grey background
+        containerColor = Color.White
     ) { paddingValues ->
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -134,7 +201,8 @@ fun HomeScreen(
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
             ) {
-                
+                Spacer(modifier = Modifier.height(16.dp))
+                SearchBarDummy(onClick = onNavigateToSearch)
                 // Banners Slider
                 if (state.banners.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -143,22 +211,21 @@ fun HomeScreen(
 
                 // Categories
                 if (state.categories.isNotEmpty()) {
-                    var categoriesAsTabs by remember { mutableStateOf(false) }
                     Spacer(modifier = Modifier.height(24.dp))
                     SectionHeader(
                         title = stringResource(R.string.categories),
                         trailing = {
-                            IconButton(onClick = { categoriesAsTabs = !categoriesAsTabs }) {
+                            IconButton(onClick = { onAction(HomeViewModelContract.Action.SetCategoriesAsTabs(!state.categoriesAsTabs)) }) {
                                 Icon(
-                                    imageVector = if (categoriesAsTabs) Icons.Default.Menu else Icons.Default.List,
-                                    contentDescription = if (categoriesAsTabs) stringResource(R.string.show_as_grid) else stringResource(R.string.show_as_tabs),
+                                    imageVector = if (state.categoriesAsTabs) Icons.Default.Menu else Icons.Default.List,
+                                    contentDescription = if (state.categoriesAsTabs) stringResource(R.string.show_as_grid) else stringResource(R.string.show_as_tabs),
                                     tint = Color(0xFFE53935)
                                 )
                             }
                         }
                     )
                     val onCategoryClick: (Int) -> Unit = { onAction(HomeViewModelContract.Action.CategoryClicked(it)) }
-                    if (categoriesAsTabs) {
+                    if (state.categoriesAsTabs) {
                         val selectedTabId = state.selectedTabCategoryId ?: state.categories.first().id
                         LaunchedEffect(selectedTabId) {
                             onAction(HomeViewModelContract.Action.CategoryTabSelected(selectedTabId))
@@ -177,9 +244,13 @@ fun HomeScreen(
                                 ) { CircularProgressIndicator(color = Color(0xFFE53935)) }
                             }
                             state.tabProducts.isNotEmpty() -> {
-                                ProductsGrid(
+                                ProductsList(
                                     products = state.tabProducts,
-                                    onProductClick = { onAction(HomeViewModelContract.Action.ProductClicked(it)) }
+                                    cartCounts = state.cartItemCounts,
+                                    onProductClick = { onAction(HomeViewModelContract.Action.ProductClicked(it)) },
+                                    onAddToCart = { onAction(HomeViewModelContract.Action.AddToCart(it)) },
+                                    onIncrease = { onAction(HomeViewModelContract.Action.IncreaseQuantity(it)) },
+                                    onDecrease = { onAction(HomeViewModelContract.Action.DecreaseQuantity(it)) },
                                 )
                             }
                             else -> {
@@ -211,22 +282,31 @@ fun SearchBarDummy(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .height(50.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color.White)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            )
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
+            .border(1.dp, Color(0xFFC62828), RoundedCornerShape(12.dp))
+            .clickable { onClick() }
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_placeholder), tint = Color.Gray)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.search_placeholder), color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.search_placeholder), 
+                color = Color.Gray, 
+                modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(60.dp)
+                    .background(Color(0xFFC62828), RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
+            }
         }
     }
 }
@@ -386,23 +466,22 @@ fun CategoriesRow(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(100.dp)
-                                .clip(CircleShape)
-                                .background(if (cat.image.isNullOrBlank()) Color(0xFFFFEBEE) else Color.White)
-                                .shadow(1.dp, CircleShape),
+                                .size(90.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(if (cat.image.isNullOrBlank()) Color(0xFFFDE4E4) else Color.Transparent),
                             contentAlignment = Alignment.Center
                         ) {
                             if (!cat.image.isNullOrBlank()) {
                                 AsyncImage(
                                     model = cat.image,
                                     contentDescription = cat.name,
-                                    modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
                                     contentScale = ContentScale.Crop
                                 )
                             } else {
                                 Text(
                                     text = cat.name.take(1).uppercase(),
-                                    color = Color(0xFFE53935),
+                                    color = Color(0xFFC62828),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 36.sp
                                 )
@@ -430,13 +509,22 @@ fun CategoriesRow(
 }
 
 @Composable
-fun ProductsHorizontalList(products: List<ProductDomain>, onProductClick: (Int) -> Unit) {
+fun ProductsHorizontalList(
+    products: List<ProductDomain>,
+    onProductClick: (Int) -> Unit,
+    onAddToCart: (Int) -> Unit = {},
+) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(products) { product ->
-            ProductCard(product, modifier = Modifier.width(150.dp), onClick = { onProductClick(product.id) })
+            ProductCard(
+                product = product,
+                modifier = Modifier.width(150.dp),
+                onClick = { onProductClick(product.id) },
+                onAddToCart = { onAddToCart(product.id) },
+            )
         }
     }
 }
@@ -445,6 +533,7 @@ fun ProductsHorizontalList(products: List<ProductDomain>, onProductClick: (Int) 
 fun ProductsGrid(
     products: List<ProductDomain>,
     onProductClick: (Int) -> Unit,
+    onAddToCart: (Int) -> Unit = {},
     columns: Int = 2,
 ) {
     val chunked = products.chunked(columns)
@@ -452,7 +541,12 @@ fun ProductsGrid(
         chunked.forEach { rowItems ->
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 rowItems.forEach { product ->
-                    ProductCard(product, modifier = Modifier.weight(1f), onClick = { onProductClick(product.id) })
+                    ProductCard(
+                        product = product,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onProductClick(product.id) },
+                        onAddToCart = { onAddToCart(product.id) },
+                    )
                 }
                 repeat(columns - rowItems.size) {
                     Spacer(modifier = Modifier.weight(1f))
@@ -464,7 +558,7 @@ fun ProductsGrid(
 }
 
 @Composable
-fun ProductCard(product: ProductDomain, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun ProductCard(product: ProductDomain, modifier: Modifier = Modifier, onClick: () -> Unit, onAddToCart: () -> Unit = {}) {
     Card(
         modifier = modifier.clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
@@ -517,15 +611,164 @@ fun ProductCard(product: ProductDomain, modifier: Modifier = Modifier, onClick: 
                         color = Color(0xFFE53935),
                         fontSize = 14.sp
                     )
-                    // Minor action e.g. add to cart
                     Box(
                         modifier = Modifier
                             .size(28.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFE53935).copy(alpha = 0.1f)),
+                            .background(Color(0xFFE53935).copy(alpha = 0.1f))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onAddToCart,
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(Icons.Default.ShoppingCart, contentDescription = "Add", tint = Color(0xFFE53935), modifier = Modifier.size(16.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProductsList(
+    products: List<ProductDomain>,
+    cartCounts: Map<Int, Int>,
+    onProductClick: (Int) -> Unit,
+    onAddToCart: (Int) -> Unit = {},
+    onIncrease: (Int) -> Unit = {},
+    onDecrease: (Int) -> Unit = {},
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        products.forEach { product ->
+            HomeProductListCard(
+                product = product,
+                cartCount = cartCounts[product.id] ?: 0,
+                onClick = { onProductClick(product.id) },
+                onAddToCart = { onAddToCart(product.id) },
+                onIncrease = { onIncrease(product.id) },
+                onDecrease = { onDecrease(product.id) },
+            )
+        }
+    }
+}
+
+@Composable
+fun HomeProductListCard(
+    product: ProductDomain,
+    cartCount: Int,
+    onClick: () -> Unit,
+    onAddToCart: () -> Unit = {},
+    onIncrease: () -> Unit = {},
+    onDecrease: () -> Unit = {},
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(110.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFAFAFA)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(end = 48.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(modifier = Modifier.width(16.dp))
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFF5F5F5)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (!product.image.isNullOrBlank()) {
+                        AsyncImage(
+                            model = product.image,
+                            contentDescription = product.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(Color(0xFFC62828), RoundedCornerShape(2.dp))
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.width(24.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = product.name,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = Color(0xFF1E1E1E),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(com.ibnalsham.app.ui.design.designSystem.R.string.currency_symbol) + " ${product.price}",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                    )
+                }
+            }
+
+            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                AnimatedContent(targetState = cartCount > 0, label = "home_list_cart") { inCart ->
+                    if (inCart) {
+                        Row(
+                            modifier = Modifier
+                                .height(40.dp)
+                                .background(
+                                    Color(0xFFC62828).copy(alpha = 0.1f),
+                                    RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
+                                ),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(
+                                modifier = Modifier.size(40.dp).clickable(onClick = onDecrease),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(Icons.Default.Remove, contentDescription = "Decrease", tint = Color(0xFFC62828), modifier = Modifier.size(18.dp))
+                            }
+                            Text(
+                                text = cartCount.toString(),
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFC62828),
+                                fontSize = 16.sp,
+                            )
+                            Box(
+                                modifier = Modifier.size(40.dp).clickable(onClick = onIncrease),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Increase", tint = Color(0xFFC62828), modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(Color(0xFFC62828), RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp))
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = onAddToCart,
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add", tint = Color.White, modifier = Modifier.size(20.dp))
+                        }
                     }
                 }
             }

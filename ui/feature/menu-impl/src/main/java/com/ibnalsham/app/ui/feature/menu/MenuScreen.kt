@@ -24,7 +24,9 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.ViewList
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -96,40 +98,49 @@ fun MenuScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.menu_title), fontWeight = FontWeight.Bold, color = Color(0xFF1E1E1E)) },
+                title = { Text(stringResource(R.string.menu_title), fontWeight = FontWeight.Medium, color = Color.White, fontSize = 20.sp) },
                 navigationIcon = {
                     if (showBackButton) {
                         IconButton(onClick = onNavigateBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(
-                                com.ibnalsham.app.ui.design.designSystem.R.string.back), tint = Color.Black)
+                                com.ibnalsham.app.ui.design.designSystem.R.string.back), tint = Color.White)
                         }
                     }
                 },
-                actions = {
-                    // View type toggle
-                    IconButton(
-                        onClick = {
-                            val newType = if (state.viewType == ViewType.GRID) ViewType.LIST else ViewType.GRID
-                            onAction(MenuViewModelContract.Action.ToggleViewType(newType))
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if (state.viewType == ViewType.GRID) Icons.Outlined.ViewList else Icons.Outlined.GridView,
-                            contentDescription = stringResource(R.string.toggle_view),
-                            tint = BrandRed,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White),
-                modifier = Modifier.shadow(2.dp),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandRed),
+                modifier = Modifier.shadow(0.dp),
             )
         },
-        bottomBar = {
-            CartFloatingBar(
-                itemCount = state.cartTotalItems,
-                subtotal = state.cartSubtotal,
-                onClick = onNavigateToCart,
-            )
+        floatingActionButton = {
+            Box {
+                FloatingActionButton(
+                    onClick = onNavigateToCart,
+                    containerColor = BrandRed,
+                    contentColor = Color.White,
+                    shape = CircleShape
+                ) {
+                    Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                }
+                if (state.cartTotalItems > 0) {
+                    Surface(
+                        shape = CircleShape,
+                        color = Color.Red,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .align(Alignment.TopStart)
+                            .offset(x = (-4).dp, y = (-4).dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = state.cartTotalItems.toString(),
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
         },
         containerColor = BackgroundColor,
     ) { paddingValues ->
@@ -143,19 +154,34 @@ fun MenuScreen(
                     CircularProgressIndicator(color = BrandRed)
                 }
             } else {
-                // Category chips
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp),
+                val selectedTabIndex = state.categories.indexOfFirst { it.id == state.selectedCategoryId }.coerceAtLeast(0)
+                ScrollableTabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    containerColor = Color.White,
+                    edgePadding = 16.dp,
+                    divider = { HorizontalDivider(color = Color(0xFFEEEEEE)) },
+                    indicator = { tabPositions ->
+                        if (selectedTabIndex < tabPositions.size) {
+                            TabRowDefaults.SecondaryIndicator(
+                                Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                                color = BrandRed
+                            )
+                        }
+                    }
                 ) {
-                    items(state.categories) { category ->
-                        CategoryItem(
-                            category = category,
-                            isSelected = state.selectedCategoryId == category.id,
+                    state.categories.forEachIndexed { index, category ->
+                        val isSelected = state.selectedCategoryId == category.id
+                        Tab(
+                            selected = isSelected,
                             onClick = { onAction(MenuViewModelContract.Action.CategorySelected(category.id)) },
+                            text = {
+                                Text(
+                                    text = category.name,
+                                    color = if (isSelected) BrandRed else Color(0xFF1A1A1A),
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 16.sp
+                                )
+                            }
                         )
                     }
                 }
@@ -165,19 +191,12 @@ fun MenuScreen(
                     targetState = state.viewType,
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     label = "view_toggle",
-                ) { viewType ->
-                    when (viewType) {
-                        ViewType.GRID -> ProductGrid(
-                            products = state.products,
-                            cartCounts = state.cartItemCounts,
-                            onAction = onAction,
-                        )
-                        ViewType.LIST -> ProductList(
-                            products = state.products,
-                            cartCounts = state.cartItemCounts,
-                            onAction = onAction,
-                        )
-                    }
+                ) { _ ->
+                    ProductList(
+                        products = state.products,
+                        cartCounts = state.cartItemCounts,
+                        onAction = onAction,
+                    )
                 }
             }
         }
@@ -409,120 +428,114 @@ private fun ProductListCard(
     onDecrease: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable{onInfoClick()},
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(110.dp)
+            .clickable { onInfoClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = CardColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // Image
-            Box(
+        Box(modifier = Modifier.fillMaxSize()) {
+            Row(
                 modifier = Modifier
-                    .size(90.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF5F5F5)),
-                contentAlignment = Alignment.Center,
+                    .fillMaxSize()
+                    .padding(end = 48.dp), // Leave space for the add button
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (!product.image.isNullOrBlank()) {
-                    AsyncImage(
-                        model = product.image,
-                        contentDescription = product.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-
-                // Count badge
-                if (cartCount > 0) {
-                    Surface(shape = CircleShape, color = BrandRed, modifier = Modifier.size(32.dp).align(Alignment.TopEnd).padding(2.dp)) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(cartCount.toString(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        }
+                Spacer(modifier = Modifier.width(16.dp))
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFF5F5F5)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (!product.image.isNullOrBlank()) {
+                        AsyncImage(
+                            model = product.image,
+                            contentDescription = product.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(BrandRed, RoundedCornerShape(2.dp))
+                        )
                     }
                 }
-            }
+                
+                Spacer(modifier = Modifier.width(24.dp))
 
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = product.name,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 15.sp,
-                    color = Color(0xFF1E1E1E),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (!product.description.isNullOrBlank()) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = product.description!!,
-                        color = Color.Gray,
-                        fontSize = 12.sp,
-                        maxLines = 1,
+                        text = product.name,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = Color(0xFF1E1E1E),
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
-                }
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (product.hasDiscount && product.discountedPrice != null) {
-                        Text("%.2f".format(product.discountedPrice), color = BrandRed, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            "%.2f".format(product.price),
-                            color = Color.Gray,
-                            fontSize = 12.sp,
-                            style = LocalTextStyle.current.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough),
-                        )
-                        Text(" JOD", color = BrandRed, fontSize = 12.sp)
-                    } else {
-                        Text("%.2f JOD".format(product.price), color = BrandRed, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "%.2f JOD".format(product.price),
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Cart controls
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Cart controls at bottom right
+            Box(
+                modifier = Modifier.align(Alignment.BottomEnd)
+            ) {
                 AnimatedContent(
                     targetState = cartCount > 0,
                     label = "list_cart",
                 ) { inCart ->
                     if (inCart) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(
+                            modifier = Modifier
+                                .height(40.dp)
+                                .background(
+                                    BrandRed.copy(alpha = 0.1f),
+                                    RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
+                                ),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .background(BrandRed, CircleShape)
-                                    .clickable(onClick = onIncrease),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White, modifier = Modifier.size(12.dp))
-                            }
-                            Text(cartCount.toString(), fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.padding(vertical = 2.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .background(Color(0xFFF5F5F5), CircleShape)
+                                    .size(40.dp)
                                     .clickable(onClick = onDecrease),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove", tint = BrandRed, modifier = Modifier.size(12.dp))
+                                Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove", tint = BrandRed, modifier = Modifier.size(16.dp))
+                            }
+                            Text(cartCount.toString(), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = BrandRed)
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clickable(onClick = onIncrease),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Add", tint = BrandRed, modifier = Modifier.size(16.dp))
                             }
                         }
                     } else {
-                        IconButton(
-                            onClick = onAddToCart,
-                            modifier = Modifier.size(40.dp).background(BrandRed, CircleShape),
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .background(
+                                    BrandRed,
+                                    RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
+                                )
+                                .clickable { onAddToCart() },
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "Add to cart", tint = Color.White, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.Add, contentDescription = "Add to cart", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                     }
                 }

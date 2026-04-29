@@ -34,6 +34,8 @@ import com.ibnalsham.app.data.order.OrderRepository
 import com.ibnalsham.app.data.order.NetworkOrderRepository
 import com.ibnalsham.app.library.data.cache.CartRepository
 import com.ibnalsham.app.library.data.cache.InMemoryCartRepository
+import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
+import com.ibnalsham.app.library.data.cache.InMemoryUserPreferencesRepository
 import com.ibnalsham.app.feature.home.presentation.viewModel.HomeViewModel
 import com.ibnalsham.app.feature.menu.presentation.viewModel.MenuViewModel
 import com.ibnalsham.app.feature.auth.presentation.viewModel.AuthViewModel
@@ -49,6 +51,7 @@ val appModule = module {
     single { networkJson }
     single { createHttpClient(get()) }
     single<CartRepository> { InMemoryCartRepository() }
+    single<UserPreferencesRepository> { InMemoryUserPreferencesRepository() }
 
     // Repositories
     single<HomeRepository> { NetworkHomeRepository(get()) }
@@ -68,8 +71,8 @@ val appModule = module {
     single<ReviewRepository> { NetworkReviewRepository(get()) }
 
     // ViewModels
-    factory { HomeViewModel(get(), get()) }
-    factory { MenuViewModel(get(), get()) }
+    factory { HomeViewModel(get(), get(), get(), get()) }
+    factory { MenuViewModel(get(), get(), get()) }
     factory { AuthViewModel(get()) }
     factory { CartViewModel(get()) }
     factory { CheckoutViewModel(get(), get()) }

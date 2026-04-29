@@ -18,6 +18,10 @@ interface HomeViewModelContract {
         data class CategoryClicked(val categoryId: Int) : Action()
         data class BannerClicked(val bannerId: Int) : Action()
         data class CategoryTabSelected(val categoryId: Int) : Action()
+        data class AddToCart(val productId: Int) : Action()
+        data class IncreaseQuantity(val productId: Int) : Action()
+        data class DecreaseQuantity(val productId: Int) : Action()
+        data class SetCategoriesAsTabs(val value: Boolean) : Action()
     }
 
     data class MyUiState(
@@ -31,6 +35,8 @@ interface HomeViewModelContract {
         val selectedTabCategoryId: Int? = null,
         val tabProducts: ImmutableList<ProductDomain> = persistentListOf(),
         val isTabLoading: Boolean = false,
+        val cartItemCounts: Map<Int, Int> = emptyMap(),
+        val categoriesAsTabs: Boolean = false,
     ) : UiState {
         companion object {
             fun defaultInstance() = MyUiState()
