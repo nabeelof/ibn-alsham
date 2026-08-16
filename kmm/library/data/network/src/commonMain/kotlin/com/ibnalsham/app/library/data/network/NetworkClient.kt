@@ -19,7 +19,7 @@ fun createHttpClient(
     json: Json,
     userPreferencesRepository: UserPreferencesRepository,
 ): HttpClient {
-    return HttpClient {
+    return platformHttpClient {
         install(ContentNegotiation) {
             json(json)
         }

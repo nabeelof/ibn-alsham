@@ -10,6 +10,9 @@ data class PlaceOrderRequestDto(
     @SerialName("address") val address: String? = null,
     @SerialName("delivery") val delivery: DeliveryDataDto? = null,
     @SerialName("notes") val notes: String? = null,
+    @SerialName("coupon_code") val couponCode: String? = null,
+    @SerialName("payment_method") val paymentMethod: String = "cash",
+    @SerialName("payment_reference") val paymentReference: String? = null,
 )
 
 @Serializable
@@ -42,9 +45,12 @@ data class OrderResponseDto(
     @SerialName("status_label") val statusLabel: String = "",
     @SerialName("subtotal") val subtotal: Double = 0.0,
     @SerialName("delivery_fee") val deliveryFee: Double = 0.0,
+    @SerialName("discount_amount") val discountAmount: Double = 0.0,
+    @SerialName("coupon_code") val couponCode: String? = null,
     @SerialName("total") val total: Double = 0.0,
     @SerialName("notes") val notes: String? = null,
     @SerialName("payment_method") val paymentMethod: String = "cash",
+    @SerialName("payment_status") val paymentStatus: String = "unpaid",
     @SerialName("can_cancel") val canCancel: Boolean = false,
     @SerialName("cancellation_deadline") val cancellationDeadline: String? = null,
     @SerialName("estimated_time") val estimatedTime: Int? = null,

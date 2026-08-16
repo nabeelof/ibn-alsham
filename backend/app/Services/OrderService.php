@@ -15,6 +15,7 @@ class OrderService
 {
     public function __construct(
         private DeliveryService $deliveryService,
+        private CouponService $couponService,
     ) {}
 
     /**
@@ -25,6 +26,9 @@ class OrderService
      * @param array $items [{product_id, quantity, option_ids: []}]
      * @param array $deliveryData {address, lat, lng} (for delivery only)
      * @param string|null $notes
+     * @param string|null $couponCode
+     * @param string $paymentMethod one of the payment_methods keys
+     * @param string|null $paymentReference CliQ / transfer reference
      * @return Order
      */
     public function createOrder(
@@ -33,8 +37,20 @@ class OrderService
         array $items,
         array $deliveryData = [],
         ?string $notes = null,
+        ?string $couponCode = null,
+        string $paymentMethod = 'cash',
+        ?string $paymentReference = null,
     ): Order {
-        return DB::transaction(function () use ($userId, $type, $items, $deliveryData, $notes) {
+        return DB::transaction(function () use (
+            $userId,
+            $type,
+            $items,
+            $deliveryData,
+            $notes,
+            $couponCode,
+            $paymentMethod,
+            $paymentReference,
+        ) {
             $subtotal = 0;
             $deliveryFee = 0;
             $distanceKm = null;
@@ -68,7 +84,9 @@ class OrderService
                 'lng' => $deliveryData['lng'] ?? null,
                 'distance_km' => $distanceKm,
                 'notes' => $notes,
-                'payment_method' => 'cash',
+                'payment_method' => $paymentMethod,
+                'payment_status' => $paymentReference !== null ? 'pending' : 'unpaid',
+                'payment_reference' => $paymentReference,
             ]);
 
             // Create order items
@@ -104,6 +122,8 @@ class OrderService
                     'product_name_en' => $product->name_en,
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
+                    // Snapshot the cost so historical margins survive price changes.
+                    'unit_cost' => $product->cost_price,
                     'discount_price' => $discountPrice,
                     'options_total' => $optionsTotal * $quantity,
                     'total' => $itemTotal,
@@ -124,11 +144,29 @@ class OrderService
                 $product->incrementOrderCount($quantity);
             }
 
+            // Apply the coupon against the item subtotal (delivery is never discounted)
+            $discount = 0.0;
+            $coupon = null;
+            if ($couponCode) {
+                $result = $this->couponService->validate($couponCode, $userId, $subtotal);
+                if ($result['ok']) {
+                    $coupon = $result['coupon'];
+                    $discount = $result['discount'];
+                }
+            }
+
             // Update order totals
             $order->update([
                 'subtotal' => $subtotal,
-                'total' => $subtotal + $deliveryFee,
+                'coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
+                'discount_amount' => $discount,
+                'total' => round($subtotal - $discount + $deliveryFee, 3),
             ]);
+
+            if ($coupon) {
+                $this->couponService->redeem($coupon, $order, $discount);
+            }
 
             // Schedule auto-confirmation after 1 minute (testing — later configurable)
             AutoConfirmOrderJob::dispatch($order->id)->delay(now()->addMinute());

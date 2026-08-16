@@ -17,11 +17,16 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":kmm:feature:domain")) // For ProductDomain
-            implementation(libs.kotlinx.coroutines.core)
+            api(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.collections.immutable)
             api(libs.koin.core)
         }
     }
+}
+
+dependencies {
+    // AppCompatDelegate backs the per-app locale read in PlatformInfo.
+    "androidMainImplementation"("androidx.appcompat:appcompat:1.7.0")
 }
 
 android {

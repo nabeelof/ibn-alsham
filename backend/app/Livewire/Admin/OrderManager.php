@@ -3,14 +3,14 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Order;
-use Livewire\Attributes\Layout;
-use Livewire\Component;
+use App\Support\Permissions;
 use Livewire\WithPagination;
 
-#[Layout('components.layouts.admin')]
-class OrderManager extends Component
+class OrderManager extends AdminPage
 {
     use WithPagination;
+
+    protected string $permission = Permissions::ORDERS_VIEW;
 
     public string $search = '';
     public string $statusFilter = '';

@@ -22,6 +22,12 @@ actual class InMemoryUserPreferencesRepository actual constructor() : UserPrefer
         sharedPreferences.edit().putBoolean(KEY_HOME_CATEGORIES_AS_TABS, enabled).apply()
     }
 
+    override fun getThemeMode(): String? = sharedPreferences.getString(KEY_THEME_MODE, null)
+
+    override fun saveThemeMode(mode: String) {
+        sharedPreferences.edit().putString(KEY_THEME_MODE, mode).apply()
+    }
+
     override fun getAuthToken(): String? = sharedPreferences.getString(KEY_AUTH_TOKEN, null)
 
     override fun saveAuthToken(token: String) {
@@ -51,6 +57,7 @@ actual class InMemoryUserPreferencesRepository actual constructor() : UserPrefer
     private companion object {
         const val KEY_VIEW_TYPE = "view_type"
         const val KEY_HOME_CATEGORIES_AS_TABS = "home_categories_as_tabs"
+        const val KEY_THEME_MODE = "theme_mode"
         const val KEY_AUTH_TOKEN = "auth_token"
         const val KEY_USER_NAME = "user_name"
         const val KEY_USER_PHONE = "user_phone"

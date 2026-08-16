@@ -17,14 +17,25 @@ class ProductController extends Controller
         $locale = app()->getLocale();
 
         $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with(['children' => fn ($q) => $q->withCount(['products' => fn ($p) => $p->where('is_available', true)])])
             ->withCount(['products' => fn ($q) => $q->where('is_available', true)])
             ->orderBy('sort_order')
             ->get()
             ->map(fn ($c) => [
                 'id' => $c->id,
+                'parent_id' => null,
                 'name' => $c->{"name_{$locale}"},
                 'icon' => $c->image ? asset("storage/{$c->image}") : null,
                 'products_count' => $c->products_count,
+                'children' => $c->children->map(fn ($child) => [
+                    'id' => $child->id,
+                    'parent_id' => $c->id,
+                    'name' => $child->{"name_{$locale}"},
+                    'icon' => $child->image ? asset("storage/{$child->image}") : null,
+                    'products_count' => $child->products_count,
+                    'children' => [],
+                ])->values(),
             ]);
 
         return $this->success($categories);
@@ -96,16 +107,36 @@ class ProductController extends Controller
         return $this->success($products);
     }
 
+    /**
+     * Search with the advanced filters used by the app's results screen:
+     * free text, category (including its subcategories), JOD price range,
+     * offers-only, and sort order.
+     */
     public function search(Request $request)
     {
         $locale = app()->getLocale();
-        $search = $request->input('name');
+        $search = $request->input('name') ?? $request->input('query');
 
-        $products = Product::with('category')
+        $minPrice = $request->filled('min_price') ? (float) $request->input('min_price') : null;
+        $maxPrice = $request->filled('max_price') ? (float) $request->input('max_price') : null;
+
+        $query = Product::with('category')
             ->where('is_available', true)
-            ->when($search, fn ($q) => $q->where("name_{$locale}", 'like', "%{$search}%"))
-            ->orderBy('sort_order')
-            ->paginate(20);
+            ->when($search, fn ($q) => $q->search($search))
+            ->when($request->filled('category_id'), fn ($q) => $q->inCategoryTree((int) $request->input('category_id')))
+            ->priceBetween($minPrice, $maxPrice)
+            ->when($request->boolean('only_offers'), fn ($q) => $q->withDiscount())
+            ->when($request->boolean('only_featured'), fn ($q) => $q->featured());
+
+        match ($request->input('sort', 'default')) {
+            'price_asc' => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            'newest' => $query->orderByDesc('created_at'),
+            'best_selling' => $query->orderByDesc('order_count'),
+            default => $query->orderBy('sort_order'),
+        };
+
+        $products = $query->paginate((int) $request->input('per_page', 20));
 
         return $this->success(
             $products->map(fn ($p) => $this->formatProduct($p, $locale)),
@@ -115,6 +146,36 @@ class ProductController extends Controller
                 'total' => $products->total(),
             ]
         );
+    }
+
+    /**
+     * Bounds and options the filter sheet needs to render itself.
+     */
+    public function filterOptions()
+    {
+        $locale = app()->getLocale();
+
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with('children')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->{"name_{$locale}"},
+                'children' => $c->children->map(fn ($child) => [
+                    'id' => $child->id,
+                    'name' => $child->{"name_{$locale}"},
+                ])->values(),
+            ]);
+
+        return $this->success([
+            'categories' => $categories,
+            'min_price' => (float) (Product::where('is_available', true)->min('price') ?? 0),
+            'max_price' => (float) (Product::where('is_available', true)->max('price') ?? 0),
+            'currency' => 'JOD',
+            'sorts' => ['default', 'price_asc', 'price_desc', 'newest', 'best_selling'],
+        ]);
     }
 
     public function searchSuggestions(Request $request)
@@ -204,9 +265,15 @@ class ProductController extends Controller
             'name' => $product->{"name_{$locale}"},
             'description' => $product->{"description_{$locale}"},
             'price' => (float) $product->price,
-            'discounted_price' => $product->discounted_price ? (float) $product->discounted_price : null,
+            'discounted_price' => $product->has_discount ? (float) $product->discounted_price : null,
+            'discount_type' => $product->discount_type ?? 'none',
+            'discount_value' => $product->discount_value !== null ? (float) $product->discount_value : null,
+            'discount_percentage' => $product->discount_percentage,
+            'has_discount' => $product->has_discount,
+            'offer_ends_at' => $product->offer_ends_at?->toIso8601String(),
             'currency_symbol' => 'JOD',
             'image_url' => $product->image ? asset("storage/{$product->image}") : null,
+            'category_id' => $product->category_id,
             'category_name' => $product->category?->{"name_{$locale}"},
             'is_available' => $product->is_available,
         ];
@@ -217,7 +284,7 @@ class ProductController extends Controller
         $locale = app()->getLocale();
         $products = Product::with('category')
             ->where('is_available', true)
-            ->where('category_id', $id)
+            ->inCategoryTree($id)
             ->orderBy('sort_order')
             ->paginate(20);
 

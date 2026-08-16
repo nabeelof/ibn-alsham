@@ -5,6 +5,10 @@ interface UserPreferencesRepository {
     fun saveViewType(viewType: String)
     fun getHomeCategoriesAsTabs(): Boolean
     fun saveHomeCategoriesAsTabs(enabled: Boolean)
+
+    /** Stored as [ThemeMode.name]; unset means [ThemeMode.System]. */
+    fun getThemeMode(): String?
+    fun saveThemeMode(mode: String)
     fun getAuthToken(): String?
     fun saveAuthToken(token: String)
     fun clearAuthToken()

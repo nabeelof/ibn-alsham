@@ -8,6 +8,7 @@ kotlin {
             api(project(":kmm:library:presentation:mvi"))
             implementation(project(":kmm:library:data:network-error"))
             api(project(":kmm:library:core:common"))
+            api(project(":kmm:library:data:cache"))
             api(libs.kotlinx.collections.immutable)
         }
     }

@@ -12,4 +12,152 @@
     <string name="nav_menu">المنيو</string>
     <string name="nav_orders">طلباتي</string>
     <string name="nav_more">المزيد</string>
+
+    <!-- Common -->
+    <string name="save">حفظ</string>
+    <string name="edit">تعديل</string>
+    <string name="delete">حذف</string>
+    <string name="apply">تطبيق</string>
+    <string name="remove">إزالة</string>
+    <string name="close">إغلاق</string>
+    <string name="search">بحث</string>
+    <string name="login_required">الرجاء تسجيل الدخول للمتابعة</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="something_went_wrong">حدث خطأ ما</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">ابحث في المنيو…</string>
+    <string name="home_special_offers">العروض الخاصة</string>
+    <string name="home_best_sellers">الأكثر مبيعاً</string>
+    <string name="home_featured">منتجات مميّزة</string>
+    <string name="home_categories">الفئات</string>
+    <string name="home_all">الكل</string>
+    <string name="active_order_title">طلبك الحالي</string>
+    <string name="active_order_track">تتبّع الطلب</string>
+    <string name="active_order_eta">حوالي %1$d دقيقة</string>
+
+    <!-- Offers -->
+    <string name="offer_percent_off">خصم %1$d%%</string>
+    <string name="offer_amount_off">خصم %1$s</string>
+
+    <!-- Product -->
+    <string name="product_add_to_cart">أضف إلى السلة</string>
+    <string name="product_required">إلزامي</string>
+    <string name="product_optional">اختياري</string>
+    <string name="product_free">مجاناً</string>
+    <string name="product_choose_one">اختر واحداً</string>
+    <string name="product_choose_up_to">اختر حتى %1$d</string>
+    <string name="product_choose_at_least">اختر %1$d على الأقل</string>
+    <string name="product_share">مشاركة</string>
+    <string name="product_add_to_favorites">إضافة إلى المفضّلة</string>
+    <string name="product_remove_from_favorites">إزالة من المفضّلة</string>
+    <string name="product_share_message">جرّب %1$s من مطعم ابن الشام: %2$s</string>
+    <string name="product_sold_out">غير متوفر</string>
+
+    <!-- Cart -->
+    <string name="cart_title">السلة</string>
+    <string name="cart_empty">سلتك فارغة</string>
+    <string name="cart_edit_addons">تعديل الإضافات</string>
+    <string name="cart_addons">الإضافات</string>
+    <string name="cart_subtotal">المجموع الفرعي</string>
+    <string name="cart_clear">إفراغ السلة</string>
+    <string name="cart_items_suffix">صنف</string>
+    <string name="cart_checkout">إتمام الطلب</string>
+
+    <!-- Checkout -->
+    <string name="checkout_title">إتمام الطلب</string>
+    <string name="checkout_delivery">توصيل</string>
+    <string name="checkout_pickup">استلام من المطعم</string>
+    <string name="checkout_payment_method">طريقة الدفع</string>
+    <string name="checkout_coupon">كوبون الخصم</string>
+    <string name="checkout_coupon_hint">أدخل كود الخصم</string>
+    <string name="checkout_coupon_applied">تم تطبيق الكوبون %1$s</string>
+    <string name="checkout_available_coupons">الكوبونات المتاحة</string>
+    <string name="checkout_discount">الخصم</string>
+    <string name="checkout_delivery_fee">رسوم التوصيل</string>
+    <string name="checkout_total">الإجمالي</string>
+    <string name="checkout_notes">ملاحظات على الطلب</string>
+    <string name="checkout_cliq_alias">حوّل المبلغ إلى اسم كليك: %1$s</string>
+    <string name="checkout_payment_reference">رقم الحوالة</string>
+    <string name="place_order">تأكيد الطلب · %1$s</string>
+
+    <!-- Search -->
+    <string name="search_title">البحث</string>
+    <string name="search_filters">الفلاتر</string>
+    <string name="search_filter_category">الفئة</string>
+    <string name="search_filter_price">نطاق السعر (دينار)</string>
+    <string name="search_filter_min">من</string>
+    <string name="search_filter_max">إلى</string>
+    <string name="search_filter_only_offers">العروض فقط</string>
+    <string name="search_filter_only_featured">المميّزة فقط</string>
+    <string name="search_filter_sort">الترتيب</string>
+    <string name="search_sort_default">الأنسب</string>
+    <string name="search_sort_price_asc">السعر: من الأقل للأعلى</string>
+    <string name="search_sort_price_desc">السعر: من الأعلى للأقل</string>
+    <string name="search_sort_newest">الأحدث</string>
+    <string name="search_sort_best_selling">الأكثر مبيعاً</string>
+    <string name="search_clear_filters">مسح الفلاتر</string>
+    <string name="search_no_results">لا توجد نتائج</string>
+    <string name="search_start_hint">ابحث عن طبق أو فئة</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">المفضّلة</string>
+    <string name="favorites_empty">لا توجد أصناف في المفضّلة</string>
+    <string name="favorites_browse_menu">تصفّح المنيو</string>
+
+    <!-- Profile -->
+    <string name="profile_title">ملفي الشخصي</string>
+    <string name="profile_name">الاسم</string>
+    <string name="profile_phone">رقم الهاتف</string>
+    <string name="profile_orders_count">الطلبات</string>
+    <string name="profile_favorites_count">المفضّلة</string>
+    <string name="profile_delete_account">حذف الحساب</string>
+    <string name="profile_delete_confirm">هل تريد حذف حسابك نهائياً؟ لا يمكن التراجع عن هذه الخطوة.</string>
+    <string name="profile_logout">تسجيل الخروج</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">الإشعارات</string>
+    <string name="notifications_empty">لا توجد إشعارات</string>
+    <string name="notifications_mark_all_read">تعيين الكل كمقروء</string>
+    <string name="notifications_clear_all">حذف الكل</string>
+
+    <!-- Guest gating -->
+    <string name="gate_eyebrow">للأعضاء</string>
+    <string name="gate_sign_in">تسجيل الدخول</string>
+    <string name="gate_continue_browsing">متابعة التصفّح</string>
+    <string name="gate_guest_name">زائر</string>
+    <string name="gate_guest_subtitle">سجّل الدخول للاستفادة من حسابك</string>
+
+    <string name="gate_favorites_title">احفظ ما يعجبك</string>
+    <string name="gate_favorites_message">سجّل الدخول للاحتفاظ بأصنافك المفضّلة على كل أجهزتك.</string>
+    <string name="gate_orders_title">تابع طلباتك</string>
+    <string name="gate_orders_message">سجّل الدخول لمتابعة طلباتك مباشرةً وإعادة الطلب بضغطة واحدة.</string>
+    <string name="gate_profile_title">حسابك</string>
+    <string name="gate_profile_message">سجّل الدخول لإدارة بياناتك وعناوينك وتفضيلاتك.</string>
+    <string name="gate_checkout_title">بقي القليل</string>
+    <string name="gate_checkout_message">سجّل الدخول لإتمام طلبك — سلّتك محفوظة وبانتظارك.</string>
+    <string name="gate_notifications_title">ابقَ على اطلاع</string>
+    <string name="gate_notifications_message">سجّل الدخول لتصلك تحديثات الطلبات والعروض الخاصة بك.</string>
+    <string name="gate_reviews_title">شاركنا رأيك</string>
+    <string name="gate_reviews_message">سجّل الدخول لتقييم الأصناف التي طلبتها.</string>
+    <string name="gate_addresses_title">احفظ عناوينك</string>
+    <string name="gate_addresses_message">سجّل الدخول لإتمام الطلب أسرع بعناوين محفوظة.</string>
+    <string name="gate_wallet_title">محفظتك</string>
+    <string name="gate_wallet_message">سجّل الدخول لعرض رصيدك ونقاطك.</string>
+
+    <!-- Shared states -->
+    <string name="error_generic_title">حدث خطأ ما</string>
+    <string name="error_generic_message">تأكّد من اتصالك بالإنترنت وحاول مجدداً.</string>
+    <string name="action_retry">إعادة المحاولة</string>
+    <string name="action_browse_menu">تصفّح المنيو</string>
+
+    <!-- Greetings -->
+    <string name="greeting_guest">جوعان؟</string>
+    <string name="greeting_named">أهلاً، %1$s</string>
+    <string name="greeting_subtitle">شو بدنا ناكل اليوم؟</string>
+    <string name="favorites_empty_message">اضغط على القلب في أي صنف ليظهر هنا.</string>
+    <string name="notifications_empty_message">ستظهر هنا تحديثات الطلبات والعروض.</string>
+    <string name="orders_empty_title">لا توجد طلبات بعد</string>
+    <string name="orders_empty_message">بمجرد أن تطلب سيظهر طلبك هنا.</string>
+    <string name="notifications_unread_count">%1$d غير مقروء</string>
 </resources>

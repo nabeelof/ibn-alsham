@@ -21,6 +21,9 @@ interface OrderRepository {
     suspend fun calculateDeliveryFee(lat: Double, lng: Double): AppResult<DomainError, DeliveryFeeResponseDto>
     suspend fun placeOrder(request: PlaceOrderRequestDto): AppResult<DomainError, OrderResponseDto>
     suspend fun getOrders(tab: String = "current"): AppResult<DomainError, ImmutableList<OrderResponseDto>>
+
+    /** The single in-flight order shown on the home screen, or null. */
+    suspend fun getActiveOrder(): AppResult<DomainError, OrderResponseDto?>
     suspend fun getOrderStatus(orderId: Int): AppResult<DomainError, OrderStatusResponseDto>
     suspend fun cancelOrder(id: Int, reason: String? = null): AppResult<DomainError, Boolean>
     suspend fun confirmDelivery(orderId: Int): AppResult<DomainError, Boolean>
@@ -93,6 +96,20 @@ class NetworkOrderRepository(
                 AppResult.Success(data.toImmutableList())
             } else {
                 AppResult.Failure(DomainError.Unknown(response.message ?: "Failed to fetch orders"))
+            }
+        } catch (e: Exception) {
+            AppResult.Failure(DomainError.NetworkError)
+        }
+    }
+
+    override suspend fun getActiveOrder(): AppResult<DomainError, OrderResponseDto?> {
+        return try {
+            val response: BaseResponse<OrderResponseDto> = httpClient.get("orders/active").body()
+            if (response.success) {
+                // A null payload simply means nothing is in flight.
+                AppResult.Success(response.data)
+            } else {
+                AppResult.Failure(DomainError.Unknown(response.message ?: "Failed to fetch active order"))
             }
         } catch (e: Exception) {
             AppResult.Failure(DomainError.NetworkError)

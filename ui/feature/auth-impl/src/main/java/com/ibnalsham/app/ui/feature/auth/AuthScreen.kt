@@ -1,30 +1,58 @@
 package com.ibnalsham.app.ui.feature.auth
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ibnalsham.app.ui.feature.authimpl.R
 import com.ibnalsham.app.feature.auth.presentation.viewModel.AuthViewModel
 import com.ibnalsham.app.feature.auth.presentation.viewModel.AuthViewModelContract
-import com.ibnalsham.app.feature.auth.presentation.viewModel.AuthViewModelContract.AuthStep
+import com.ibnalsham.app.ui.design.components.CircleIconButton
+import com.ibnalsham.app.ui.design.components.TextAction
+import com.ibnalsham.app.ui.design.motion.enterFromBottom
+import com.ibnalsham.app.ui.design.theme.AppTheme
+import com.ibnalsham.app.ui.design.theme.Spacing
+import com.ibnalsham.app.ui.design.designSystem.R as DesignR
+import com.ibnalsham.app.ui.feature.authimpl.R
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Full-screen sign-in.
+ *
+ * Still reachable (deep links, expired sessions, the More screen) but no longer
+ * the only way in — most guests meet [GateAuthForm] inside the gate sheet and
+ * never leave the screen they were on.
+ */
 @Composable
 fun AuthRoute(
     viewModel: AuthViewModel = koinViewModel(),
     onNavigateToHome: () -> Unit,
-    onShowSnackbar: (String) -> Unit
+    onShowSnackbar: (String) -> Unit,
+    onDismiss: (() -> Unit)? = null,
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -37,183 +65,95 @@ fun AuthRoute(
         }
     }
 
-    AuthScreen(
-        state = state,
-        onAction = viewModel::onAction
-    )
+    AuthScreen(state = state, onAction = viewModel::onAction, onDismiss = onDismiss)
 }
 
 @Composable
 fun AuthScreen(
     state: AuthViewModelContract.MyUiState,
-    onAction: (AuthViewModelContract.Action) -> Unit
+    onAction: (AuthViewModelContract.Action) -> Unit,
+    onDismiss: (() -> Unit)? = null,
 ) {
+    val colors = AppTheme.colors
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAFAFA))
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
+            .background(colors.background),
     ) {
-        Column(
+        // Warm gradient block behind the brand mark, so the screen opens on the
+        // same colour language as the rest of the app rather than plain grey.
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(24.dp))
-                .border(1.dp, Color(0xFFFFEBEE), RoundedCornerShape(24.dp))
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .height(280.dp)
+                .background(colors.heroGradient),
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .imePadding()
+                .navigationBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            if (onDismiss != null) {
+                Box(modifier = Modifier.fillMaxWidth().padding(Spacing.md)) {
+                    CircleIconButton(
+                        icon = Icons.Rounded.Close,
+                        contentDescription = stringResource(DesignR.string.close),
+                        onClick = onDismiss,
+                        onImage = true,
+                        modifier = Modifier.align(Alignment.CenterStart),
+                    )
+                }
+            } else {
+                Spacer(Modifier.height(Spacing.huge))
+            }
+
             Box(
                 modifier = Modifier
-                    .size(90.dp)
-                    .background(Color(0xFFC62828), RoundedCornerShape(18.dp)),
-                contentAlignment = Alignment.Center
+                    .size(104.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(colors.surface)
+                    .enterFromBottom(index = 0),
+                contentAlignment = Alignment.Center,
             ) {
-                Text(stringResource(R.string.app_name_ar), color = Color(0xFFFFD54F), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = stringResource(R.string.app_name_ar),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colors.brand,
+                    textAlign = TextAlign.Center,
+                )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(Modifier.height(Spacing.xxxl))
 
-            when (state.step) {
-                AuthStep.PHONE -> PhoneStep(state, onAction)
-                AuthStep.OTP -> OtpStep(state, onAction)
-                AuthStep.REGISTER -> RegisterStep(state, onAction)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.gutter)
+                    .enterFromBottom(index = 1)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(colors.surface)
+                    .padding(Spacing.xxl),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AuthFlow(state = state, onAction = onAction)
             }
+
+            if (onDismiss != null) {
+                Spacer(Modifier.height(Spacing.lg))
+                TextAction(
+                    text = stringResource(DesignR.string.gate_continue_browsing),
+                    onClick = onDismiss,
+                    color = colors.textSecondary,
+                )
+            }
+
+            Spacer(Modifier.height(Spacing.huge))
         }
-    }
-}
-
-@Composable
-fun PhoneStep(state: AuthViewModelContract.MyUiState, onAction: (AuthViewModelContract.Action) -> Unit) {
-    Text(stringResource(R.string.login_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(stringResource(R.string.enter_phone_desc), color = Color.Gray, textAlign = TextAlign.Center)
-    
-    Spacer(modifier = Modifier.height(32.dp))
-
-    OutlinedTextField(
-        value = state.phoneInput,
-        onValueChange = { onAction(AuthViewModelContract.Action.UpdatePhone(it)) },
-        label = { Text(stringResource(R.string.phone_label)) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    Button(
-        onClick = { onAction(AuthViewModelContract.Action.RequestOtp(state.phoneInput)) },
-        modifier = Modifier.fillMaxWidth().height(50.dp),
-        enabled = !state.isLoading,
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828)),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        if (state.isLoading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-        else Text(stringResource(R.string.send_otp), color = Color.White, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-fun OtpStep(state: AuthViewModelContract.MyUiState, onAction: (AuthViewModelContract.Action) -> Unit) {
-    Text(stringResource(R.string.verify_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(stringResource(R.string.enter_otp_desc, state.phoneInput), color = Color.Gray, textAlign = TextAlign.Center)
-    
-    Spacer(modifier = Modifier.height(32.dp))
-
-    OutlinedTextField(
-        value = state.otpInput,
-        onValueChange = {
-            val input = it.take(4).filter(Char::isDigit)
-            onAction(AuthViewModelContract.Action.UpdateOtp(input))
-            if (input.length == 4) onAction(AuthViewModelContract.Action.VerifyOtp(state.phoneInput, input))
-        },
-        label = { Text(stringResource(R.string.otp_label)) },
-        modifier = Modifier.fillMaxWidth(0.6f),
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
-    )
-
-    Spacer(modifier = Modifier.height(10.dp))
-    Text("OTP test code: 1234", color = Color(0xFF757575), style = MaterialTheme.typography.bodySmall)
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    if (state.isLoading) {
-        CircularProgressIndicator(color = Color(0xFFC62828))
-    } else {
-        if (state.timerSeconds > 0) {
-            Text(stringResource(R.string.resend_in, state.timerSeconds), color = Color.Gray)
-        } else {
-            TextButton(onClick = { onAction(AuthViewModelContract.Action.ResendOtp) }) {
-                Text(stringResource(R.string.resend_now), color = Color(0xFFC62828), fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    TextButton(onClick = { onAction(AuthViewModelContract.Action.BackToPhone) }) {
-        Text(stringResource(R.string.change_phone), color = Color.Gray)
-    }
-}
-
-@Composable
-fun RegisterStep(state: AuthViewModelContract.MyUiState, onAction: (AuthViewModelContract.Action) -> Unit) {
-    Text(stringResource(R.string.complete_profile), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(stringResource(R.string.welcome_new), color = Color.Gray, textAlign = TextAlign.Center)
-    
-    Spacer(modifier = Modifier.height(32.dp))
-
-    OutlinedTextField(
-        value = state.phoneInput,
-        onValueChange = {},
-        label = { Text(stringResource(R.string.phone_label)) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        enabled = false,
-        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
-    )
-
-    Spacer(modifier = Modifier.height(12.dp))
-
-    OutlinedTextField(
-        value = state.otpInput,
-        onValueChange = {},
-        label = { Text(stringResource(R.string.otp_label)) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        enabled = false,
-        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-    Text("Testing OTP from backend: 1234", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    OutlinedTextField(
-        value = state.nameInput,
-        onValueChange = { onAction(AuthViewModelContract.Action.UpdateName(it)) },
-        label = { Text(stringResource(R.string.full_name)) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC62828))
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    Button(
-        onClick = { onAction(AuthViewModelContract.Action.Register(state.phoneInput, state.otpInput, state.nameInput)) },
-        modifier = Modifier.fillMaxWidth().height(50.dp),
-        enabled = !state.isLoading,
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828)),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        if (state.isLoading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-        else Text(stringResource(R.string.create_account), color = Color.White, fontWeight = FontWeight.Bold)
     }
 }

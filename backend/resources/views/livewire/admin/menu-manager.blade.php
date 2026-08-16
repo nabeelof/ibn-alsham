@@ -129,6 +129,11 @@
                             <input wire:model="discountedPrice" type="number" step="0.001" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none">
                         </div>
                         <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">سعر التكلفة (JOD)</label>
+                            <input wire:model="costPrice" type="number" step="0.001" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none">
+                            <span class="text-[11px] text-gray-400">يُستخدم لحساب الربح في المحاسبة</span>
+                        </div>
+                        <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">القسم *</label>
                             <select wire:model="categoryId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none">
                                 <option value="">اختر القسم</option>

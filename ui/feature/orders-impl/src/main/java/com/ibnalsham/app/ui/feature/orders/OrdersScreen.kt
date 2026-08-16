@@ -7,17 +7,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.ReceiptLong
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -29,6 +32,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.ibnalsham.app.library.data.cache.GatedFeature
+import com.ibnalsham.app.ui.design.components.AnimatedPrice
+import com.ibnalsham.app.ui.design.components.AppCard
+import com.ibnalsham.app.ui.design.components.AppTopBar
+import com.ibnalsham.app.ui.design.components.SignInRequiredState
+import com.ibnalsham.app.ui.design.components.SkeletonBlock
+import com.ibnalsham.app.ui.design.components.StateView
+import com.ibnalsham.app.ui.design.components.Tag
+import com.ibnalsham.app.ui.design.components.jodPrice
+import com.ibnalsham.app.ui.design.gate.LocalAuthGate
+import com.ibnalsham.app.ui.design.motion.enterFromBottom
+import com.ibnalsham.app.ui.design.theme.AppTextStyles
+import com.ibnalsham.app.ui.design.theme.AppTheme
+import com.ibnalsham.app.ui.design.theme.Motion
+import com.ibnalsham.app.ui.design.theme.Spacing
+import com.ibnalsham.app.ui.design.designSystem.R as DesignR
 import com.ibnalsham.app.ui.feature.ordersimpl.R
 import com.ibnalsham.app.feature.domain.OrderDomain
 import com.ibnalsham.app.feature.domain.OrderStatus
@@ -37,9 +56,11 @@ import com.ibnalsham.app.feature.orders.presentation.viewModel.OrdersViewModel
 import com.ibnalsham.app.feature.orders.presentation.viewModel.OrdersViewModelContract
 import org.koin.androidx.compose.koinViewModel
 
-private val BrandRed = Color(0xFFC62828)
-private val BrandOrange = Color(0xFFFF6D00)
-private val BrandGreen = Color(0xFF2E7D32)
+// The live-tracking screens below still address these directly; they now point
+// at the design-system palette instead of one-off hex values.
+private val BrandRed = com.ibnalsham.app.ui.design.theme.Ember
+private val BrandOrange = com.ibnalsham.app.ui.design.theme.Saffron
+private val BrandGreen = com.ibnalsham.app.ui.design.theme.Basil
 
 @Composable
 fun OrdersRoute(
@@ -48,8 +69,12 @@ fun OrdersRoute(
     onNavigateToOrderDetails: (Int) -> Unit = {},
     onShowSnackbar: (String) -> Unit = {},
     onNavigateBack: () -> Unit = {},
+    onNavigateToMenu: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsState()
+    val gate = LocalAuthGate.current
+    val cancelledMessage = stringResource(R.string.order_cancelled_message)
+    val reviewThanksMessage = stringResource(R.string.review_thanks_message)
 
     LaunchedEffect(Unit) {
         viewModel.onAction(OrdersViewModelContract.Action.ViewReady)
@@ -58,8 +83,9 @@ fun OrdersRoute(
             when (effect) {
                 is OrdersViewModelContract.SideEffect.NavigateToOrderDetails -> onNavigateToOrderDetails(effect.orderId)
                 is OrdersViewModelContract.SideEffect.ShowSnackbar -> onShowSnackbar(effect.message)
-                OrdersViewModelContract.SideEffect.OrderCancelled -> onShowSnackbar("Order cancelled successfully")
-                OrdersViewModelContract.SideEffect.ReviewSubmitted -> onShowSnackbar("Thank you for your review! 🎉")
+                OrdersViewModelContract.SideEffect.OrderCancelled -> onShowSnackbar(cancelledMessage)
+                OrdersViewModelContract.SideEffect.ReviewSubmitted -> onShowSnackbar(reviewThanksMessage)
+                OrdersViewModelContract.SideEffect.RequireSignIn -> gate.prompt(GatedFeature.Orders)
             }
         }
     }
@@ -85,6 +111,7 @@ fun OrdersRoute(
             state = state,
             onAction = viewModel::onAction,
             onNavigateBack = onNavigateBack,
+            onNavigateToMenu = onNavigateToMenu,
         )
     }
 
@@ -101,72 +128,183 @@ fun OrdersRoute(
     }
 }
 
-// ─── Order List Screen ───────────────────────────────────────────────────────
-
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Order history.
+ *
+ * This tab used to load unconditionally, so a guest tapping it saw a bare
+ * error. It now shows the sign-in state, and signing in loads the list in
+ * place without leaving the tab.
+ */
 @Composable
 private fun OrderListScreen(
     state: OrdersViewModelContract.MyUiState,
     onAction: (OrdersViewModelContract.Action) -> Unit,
     onNavigateBack: () -> Unit,
+    onNavigateToMenu: () -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.orders_title), fontWeight = FontWeight.Bold) },
-                navigationIcon = { },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White),
-                modifier = Modifier.shadow(2.dp),
+    val colors = AppTheme.colors
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background),
+    ) {
+        AppTopBar(title = stringResource(R.string.orders_title))
+
+        if (state.requiresLogin) {
+            SignInRequiredState(
+                title = stringResource(DesignR.string.gate_orders_title),
+                message = stringResource(DesignR.string.gate_orders_message),
+                onSignIn = { onAction(OrdersViewModelContract.Action.SignInClicked) },
+                browseActionText = stringResource(DesignR.string.action_browse_menu),
+                onBrowse = onNavigateToMenu,
             )
-        },
-        containerColor = Color(0xFFFAFAFA),
-    ) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            // Tabs
-            TabRow(
-                selectedTabIndex = if (state.selectedTab == OrdersViewModelContract.OrderTab.CURRENT) 0 else 1,
-                containerColor = Color.White,
-                contentColor = BrandRed,
-                indicator = { tabPositions ->
-                    TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[if (state.selectedTab == OrdersViewModelContract.OrderTab.CURRENT) 0 else 1]),
-                        color = BrandRed,
-                    )
-                },
+            return@Column
+        }
+
+        OrderTabs(
+            selected = state.selectedTab,
+            onSelect = { onAction(OrdersViewModelContract.Action.SelectTab(it)) },
+        )
+
+        when {
+            state.isLoading -> Column(
+                modifier = Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.md),
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
-                Tab(
-                    selected = state.selectedTab == OrdersViewModelContract.OrderTab.CURRENT,
-                    onClick = { onAction(OrdersViewModelContract.Action.SelectTab(OrdersViewModelContract.OrderTab.CURRENT)) },
-                    text = { Text(stringResource(R.string.tab_current), fontWeight = FontWeight.Bold) },
+                repeat(4) {
+                    SkeletonBlock(
+                        modifier = Modifier.fillMaxWidth().height(96.dp),
+                        shape = MaterialTheme.shapes.medium,
+                    )
+                }
+            }
+
+            state.displayedOrders.isEmpty() -> StateView(
+                icon = Icons.Rounded.ReceiptLong,
+                title = stringResource(DesignR.string.orders_empty_title),
+                message = stringResource(DesignR.string.orders_empty_message),
+                primaryActionText = stringResource(DesignR.string.action_browse_menu),
+                onPrimaryAction = onNavigateToMenu,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            else -> LazyColumn(
+                contentPadding = PaddingValues(
+                    start = Spacing.gutter,
+                    end = Spacing.gutter,
+                    top = Spacing.md,
+                    bottom = Spacing.navBarClearance,
+                ),
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+            ) {
+                itemsIndexed(state.displayedOrders, key = { _, order -> order.id }) { index, order ->
+                    OrderCard(
+                        order = order,
+                        onClick = { onAction(OrdersViewModelContract.Action.StartTracking(order.id)) },
+                        modifier = Modifier.enterFromBottom(index = index),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Segmented current/previous switch with a sliding pill. */
+@Composable
+private fun OrderTabs(
+    selected: OrdersViewModelContract.OrderTab,
+    onSelect: (OrdersViewModelContract.OrderTab) -> Unit,
+) {
+    val colors = AppTheme.colors
+    val tabs = listOf(
+        OrdersViewModelContract.OrderTab.CURRENT to stringResource(R.string.tab_current),
+        OrdersViewModelContract.OrderTab.PREVIOUS to stringResource(R.string.tab_previous),
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.gutter, vertical = Spacing.sm)
+            .clip(CircleShape)
+            .background(colors.surfaceSunken)
+            .padding(Spacing.xs),
+    ) {
+        tabs.forEach { (tab, label) ->
+            val isSelected = tab == selected
+            val background by animateColorAsState(
+                targetValue = if (isSelected) colors.surface else Color.Transparent,
+                animationSpec = Motion.snappy(),
+                label = "orderTabBackground",
+            )
+            val content by animateColorAsState(
+                targetValue = if (isSelected) colors.brand else colors.textSecondary,
+                animationSpec = Motion.snappy(),
+                label = "orderTabContent",
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(CircleShape)
+                    .background(background)
+                    .clickable { onSelect(tab) }
+                    .padding(vertical = Spacing.md),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = label, style = MaterialTheme.typography.labelLarge, color = content)
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrderCard(order: OrderDomain, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = AppTheme.colors
+
+    AppCard(modifier = modifier.fillMaxWidth(), onClick = onClick, elevation = 4.dp) {
+        Column(modifier = Modifier.padding(Spacing.lg)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "#${order.orderNumber}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.textPrimary,
                 )
-                Tab(
-                    selected = state.selectedTab == OrdersViewModelContract.OrderTab.PREVIOUS,
-                    onClick = { onAction(OrdersViewModelContract.Action.SelectTab(OrdersViewModelContract.OrderTab.PREVIOUS)) },
-                    text = { Text(stringResource(R.string.tab_previous), fontWeight = FontWeight.Bold) },
+                StatusChip(order.status, order.statusLabel)
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.sm))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = order.createdAt,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textTertiary,
+                )
+                Text(
+                    text = jodPrice(order.total),
+                    style = AppTextStyles.price,
+                    color = colors.textPrimary,
                 )
             }
 
-            if (state.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = BrandRed)
-                }
-            } else if (state.displayedOrders.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(imageVector = Icons.Default.Receipt, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(stringResource(R.string.no_orders), fontSize = 18.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
-                    }
-                }
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(state.displayedOrders, key = { it.id }) { order ->
-                        OrderCard(
-                            order = order,
-                            onClick = { onAction(OrdersViewModelContract.Action.StartTracking(order.id)) },
+            order.rating?.let { rating ->
+                Spacer(modifier = Modifier.height(Spacing.sm))
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
+                    repeat(rating) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(14.dp),
                         )
                     }
                 }
@@ -175,58 +313,23 @@ private fun OrderListScreen(
     }
 }
 
-@Composable
-private fun OrderCard(order: OrderDomain, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp),
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("#${order.orderNumber}", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                StatusChip(order.status, order.statusLabel)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(order.createdAt, color = Color.Gray, fontSize = 12.sp)
-                Text(stringResource(com.ibnalsham.app.ui.design.designSystem.R.string.currency_symbol) + " ${"%.3f".format(order.total)}", fontWeight = FontWeight.Bold, color = BrandRed, fontSize = 15.sp)
-            }
-            order.rating?.let { rating ->
-                Spacer(modifier = Modifier.height(4.dp))
-                Row {
-                    for (i in 1..rating) {
-                        Text("⭐", fontSize = 12.sp)
-                    }
-                }
-            }
-        }
-    }
-}
-
+/** Status pill, coloured by what the status means rather than by brand. */
 @Composable
 private fun StatusChip(status: OrderStatus, label: String) {
-    val (bgColor, textColor) = when (status) {
-        OrderStatus.PENDING -> Color(0xFFFFF8E1) to Color(0xFFF57F17)
-        OrderStatus.CONFIRMED -> Color(0xFFE3F2FD) to Color(0xFF1565C0)
-        OrderStatus.PREPARING -> Color(0xFFE8F5E9) to Color(0xFF2E7D32)
-        OrderStatus.READY -> Color(0xFFE0F7FA) to Color(0xFF00838F)
-        OrderStatus.OUT_FOR_DELIVERY -> Color(0xFFFCE4EC) to Color(0xFFC62828)
-        OrderStatus.DELIVERED -> Color(0xFFE8F5E9) to BrandGreen
-        OrderStatus.COMPLETED -> Color(0xFFE8F5E9) to BrandGreen
-        OrderStatus.CANCELLED -> Color(0xFFFFEBEE) to Color(0xFFC62828)
+    val colors = AppTheme.colors
+    val (background, content) = when (status) {
+        OrderStatus.PENDING -> colors.warningSoft to colors.warning
+        OrderStatus.CONFIRMED,
+        OrderStatus.PREPARING,
+        OrderStatus.READY,
+        OrderStatus.OUT_FOR_DELIVERY,
+        -> colors.brand.copy(alpha = 0.12f) to colors.brand
+
+        OrderStatus.DELIVERED, OrderStatus.COMPLETED -> colors.successSoft to colors.success
+        OrderStatus.CANCELLED -> colors.dangerSoft to colors.danger
     }
-    Surface(shape = RoundedCornerShape(20.dp), color = bgColor) {
-        Text(label, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-    }
+
+    Tag(text = label, background = background, contentColor = content)
 }
 
 // ─── Order Tracking Screen ───────────────────────────────────────────────────

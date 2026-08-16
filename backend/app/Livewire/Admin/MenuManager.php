@@ -6,16 +6,16 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductOptionGroup;
 use App\Models\ProductOption;
-use Livewire\Attributes\Layout;
+use App\Support\Permissions;
 use Livewire\Attributes\Rule;
-use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
-#[Layout('components.layouts.admin')]
-class MenuManager extends Component
+class MenuManager extends AdminPage
 {
     use WithPagination, WithFileUploads;
+
+    protected string $permission = Permissions::PRODUCTS_VIEW;
 
     public string $search = '';
     public string $categoryFilter = '';
@@ -36,6 +36,9 @@ class MenuManager extends Component
     public string $price = '';
 
     public string $discountedPrice = '';
+
+    /** Purchase cost — feeds the profit calculation in the accounting screen. */
+    public string $costPrice = '';
 
     #[Rule('required|exists:categories,id')]
     public string $categoryId = '';
@@ -75,6 +78,7 @@ class MenuManager extends Component
         $this->descriptionEn = $product->description_en ?? '';
         $this->price = (string) $product->price;
         $this->discountedPrice = (string) ($product->discounted_price ?? '');
+        $this->costPrice = (string) ($product->cost_price ?? '');
         $this->categoryId = (string) $product->category_id;
         $this->isAvailable = $product->is_available;
         $this->formMode = 'edit';
@@ -91,6 +95,7 @@ class MenuManager extends Component
             'description_en' => $this->descriptionEn,
             'price' => (float) $this->price,
             'discounted_price' => $this->discountedPrice ? (float) $this->discountedPrice : null,
+            'cost_price' => $this->costPrice !== '' ? (float) $this->costPrice : null,
             'category_id' => (int) $this->categoryId,
             'is_available' => $this->isAvailable,
         ];
@@ -221,7 +226,7 @@ class MenuManager extends Component
         $this->formMode = '';
         $this->editingProductId = null;
         $this->nameAr = $this->nameEn = $this->descriptionAr = $this->descriptionEn = '';
-        $this->price = $this->discountedPrice = $this->categoryId = '';
+        $this->price = $this->discountedPrice = $this->costPrice = $this->categoryId = '';
         $this->isAvailable = true;
         $this->image = null;
         $this->resetValidation();

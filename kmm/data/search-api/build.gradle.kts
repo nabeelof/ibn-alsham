@@ -20,6 +20,8 @@ kotlin {
             implementation(project(":kmm:library:data:network"))
             implementation(project(":kmm:library:data:network-error"))
             implementation(project(":kmm:library:core:common"))
+            api(project(":kmm:feature:domain"))
+            api(project(":kmm:data:home-api"))
             implementation(libs.kotlinx.collections.immutable)
 
             implementation(libs.ktor.client.core)

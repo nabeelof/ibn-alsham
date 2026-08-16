@@ -29,12 +29,22 @@ class HomeController extends Controller
             ]);
 
         $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with('children')
             ->orderBy('sort_order')
             ->get()
             ->map(fn ($c) => [
                 'id' => $c->id,
+                'parent_id' => null,
                 'name' => $c->{"name_{$locale}"},
                 'icon' => $c->image ? asset("storage/{$c->image}") : null,
+                'children' => $c->children->map(fn ($child) => [
+                    'id' => $child->id,
+                    'parent_id' => $c->id,
+                    'name' => $child->{"name_{$locale}"},
+                    'icon' => $child->image ? asset("storage/{$child->image}") : null,
+                    'children' => [],
+                ])->values(),
             ]);
 
         $featuredProducts = Product::with('category')
@@ -47,7 +57,15 @@ class HomeController extends Controller
 
         $specialOffers = Product::with('category')
             ->where('is_available', true)
-            ->whereNotNull('discounted_price')
+            ->withDiscount()
+            ->take(8)
+            ->get()
+            ->map(fn ($p) => $this->formatProduct($p, $locale));
+
+        $mostOrdered = Product::with('category')
+            ->where('is_available', true)
+            ->where('order_count', '>', 0)
+            ->orderByDesc('order_count')
             ->take(8)
             ->get()
             ->map(fn ($p) => $this->formatProduct($p, $locale));
@@ -59,8 +77,40 @@ class HomeController extends Controller
             'categories' => $categories,
             'featured_products' => $featuredProducts,
             'special_offers' => $specialOffers,
+            'most_ordered' => $mostOrdered,
+            'active_order' => $this->activeOrder($locale),
             'announcement' => $settings->get('announcement'),
         ]);
+    }
+
+    /**
+     * The order status card shown at the top of home, or null when the
+     * caller is a guest or has nothing in flight.
+     */
+    private function activeOrder(string $locale): ?array
+    {
+        // /home is a public route, so the default guard never resolves a
+        // bearer token — ask Sanctum directly.
+        $user = auth('sanctum')->user();
+        if (!$user) {
+            return null;
+        }
+
+        $order = $user->orders()->current()->latest()->first();
+        if (!$order) {
+            return null;
+        }
+
+        return [
+            'id' => $order->id,
+            'order_number' => $order->order_number,
+            'type' => $order->type,
+            'status' => $order->status,
+            'status_label' => $locale === 'ar' ? $order->status_label_ar : $order->status_label_en,
+            'total' => (float) $order->total,
+            'estimated_time' => $order->estimated_time,
+            'created_at' => $order->created_at->format('Y-m-d H:i'),
+        ];
     }
 
     private function formatProduct($product, string $locale): array
@@ -70,8 +120,15 @@ class HomeController extends Controller
             'name' => $product->{"name_{$locale}"},
             'description' => $product->{"description_{$locale}"},
             'price' => (float) $product->price,
-            'discounted_price' => $product->discounted_price ? (float) $product->discounted_price : null,
+            'discounted_price' => $product->has_discount ? (float) $product->discounted_price : null,
+            'discount_type' => $product->discount_type ?? 'none',
+            'discount_value' => $product->discount_value !== null ? (float) $product->discount_value : null,
+            'discount_percentage' => $product->discount_percentage,
+            'has_discount' => $product->has_discount,
+            'offer_ends_at' => $product->offer_ends_at?->toIso8601String(),
+            'currency_symbol' => 'JOD',
             'image_url' => $product->image ? asset("storage/{$product->image}") : null,
+            'category_id' => $product->category_id,
             'category_name' => $product->category?->{"name_{$locale}"},
         ];
     }

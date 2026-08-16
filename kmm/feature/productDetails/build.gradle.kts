@@ -7,7 +7,9 @@ kotlin {
             implementation(project(":kmm:library:data:network-error"))
             api(project(":kmm:library:core:common"))
             implementation(project(":kmm:data:menu-api"))
-            implementation(project(":kmm:library:data:cache"))
+            implementation(project(":kmm:data:product-api"))
+            implementation(project(":kmm:data:favorites-api"))
+            api(project(":kmm:library:data:cache"))
             api(project(":kmm:feature:domain"))
             api(libs.kotlinx.collections.immutable)
         }

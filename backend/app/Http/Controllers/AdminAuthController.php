@@ -23,14 +23,19 @@ class AdminAuthController extends Controller
             'password' => ['required'],
         ]);
 
+        // A disabled admin must not be able to sign in at all.
+        $credentials['is_active'] = true;
+
         if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+
+            Auth::guard('admin')->user()->forceFill(['last_login_at' => now()])->save();
 
             return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors([
-            'email' => 'البيانات المدخلة لا تتطابق مع سجلاتنا.',
+            'email' => 'البيانات المدخلة لا تتطابق مع سجلاتنا، أو أن الحساب معطّل.',
         ])->onlyInput('email');
     }
 

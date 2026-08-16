@@ -6,4 +6,5 @@
     <string name="start_shopping">ابدأ التسوق</string>
     <string name="total">المجموع</string>
     <string name="proceed_checkout">المتابعة للدفع</string>
+    <string name="items_count">%1$d صنف</string>
 </resources>

@@ -63,6 +63,15 @@ struct HomeScreen: View {
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
+                            // In-flight order status card
+                            if let order = viewModel.uiState.activeOrder {
+                                ActiveOrderCard(order: order) {
+                                    viewModel.dispatch(action: HomeViewModelContractActionActiveOrderClicked())
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                            }
+
                             // Banners Proxy
                             if !viewModel.uiState.banners.isEmpty {
                                 Rectangle()
@@ -106,9 +115,32 @@ struct HomeScreen: View {
                                 }
                             }
                             
+                            // Special offers — percentage and fixed-amount discounts
+                            if !viewModel.uiState.specialOffers.isEmpty {
+                                ProductSection(
+                                    title: "العروض الخاصة",
+                                    products: viewModel.uiState.specialOffers
+                                ) { productId in
+                                    viewModel.dispatch(
+                                        action: HomeViewModelContractActionProductClicked(productId: productId)
+                                    )
+                                }
+                            }
+
+                            if !viewModel.uiState.mostOrdered.isEmpty {
+                                ProductSection(
+                                    title: "الأكثر مبيعاً",
+                                    products: viewModel.uiState.mostOrdered
+                                ) { productId in
+                                    viewModel.dispatch(
+                                        action: HomeViewModelContractActionProductClicked(productId: productId)
+                                    )
+                                }
+                            }
+
                             // Featured Products
                             VStack(alignment: .leading, spacing: 12) {
-                                Text("الأكثر مبيعاً")
+                                Text("منتجات مميّزة")
                                     .font(.system(size: 18, weight: .bold))
                                     .padding(.horizontal, 16)
                                 
@@ -154,6 +186,109 @@ struct HomeScreen: View {
         .environment(\.layoutDirection, .rightToLeft)
         .onAppear {
             viewModel.dispatch(action: HomeViewModelContractActionViewReady())
+        }
+    }
+}
+
+
+/// Status card for the order currently in flight. Tapping it opens tracking.
+struct ActiveOrderCard: View {
+    let order: ActiveOrderDomain
+    let onTap: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "bag.fill")
+                .frame(width: 44, height: 44)
+                .background(Color.white.opacity(0.2))
+                .clipShape(Circle())
+                .foregroundColor(.white)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("طلبك الحالي")
+                    .font(.system(size: 12))
+                    .foregroundColor(.white.opacity(0.85))
+                Text(order.statusLabel.isEmpty ? order.orderNumber : order.statusLabel)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                if let eta = order.estimatedTime {
+                    Text("حوالي \(eta) دقيقة")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.85))
+                }
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(JodPrice.format(order.total))
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.white)
+                Text("تتبّع الطلب")
+                    .font(.system(size: 12))
+                    .foregroundColor(.white.opacity(0.85))
+            }
+        }
+        .padding(16)
+        .background(Color(hex: "C62828"))
+        .cornerRadius(16)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onTap)
+    }
+}
+
+/// A titled horizontal carousel of product cards.
+struct ProductSection: View {
+    let title: String
+    let products: [ProductDomain]
+    let onProductTap: (Int32) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.system(size: 18, weight: .bold))
+                .padding(.horizontal, 16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(products, id: \.id) { product in
+                        Button {
+                            onProductTap(product.id)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 8) {
+                                AsyncImage(url: URL(string: product.image ?? "")) { image in
+                                    image.resizable().scaledToFill()
+                                } placeholder: {
+                                    Rectangle().fill(Color.gray.opacity(0.15))
+                                }
+                                .frame(width: 150, height: 150)
+                                .clipped()
+                                .cornerRadius(12)
+
+                                Text(product.name)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.black)
+                                    .lineLimit(2)
+
+                                HStack(spacing: 6) {
+                                    Text(JodPrice.format(product.effectivePrice))
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(Color(hex: "C62828"))
+
+                                    if product.hasDiscount {
+                                        Text(JodPrice.format(product.price))
+                                            .font(.system(size: 11))
+                                            .strikethrough()
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
+                            .frame(width: 150)
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
         }
     }
 }

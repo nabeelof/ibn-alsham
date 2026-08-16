@@ -23,6 +23,12 @@ actual class InMemoryUserPreferencesRepository actual constructor() : UserPrefer
         defaults.setBool(enabled, forKey = KEY_HOME_CATEGORIES_AS_TABS)
     }
 
+    override fun getThemeMode(): String? = defaults.stringForKey(KEY_THEME_MODE)
+
+    override fun saveThemeMode(mode: String) {
+        defaults.setObject(mode, forKey = KEY_THEME_MODE)
+    }
+
     override fun getAuthToken(): String? = defaults.stringForKey(KEY_AUTH_TOKEN)
 
     override fun saveAuthToken(token: String) {
@@ -53,6 +59,7 @@ actual class InMemoryUserPreferencesRepository actual constructor() : UserPrefer
     private companion object {
         const val KEY_VIEW_TYPE = "view_type"
         const val KEY_HOME_CATEGORIES_AS_TABS = "home_categories_as_tabs"
+        const val KEY_THEME_MODE = "theme_mode"
         const val KEY_AUTH_TOKEN = "auth_token"
         const val KEY_USER_NAME = "user_name"
         const val KEY_USER_PHONE = "user_phone"

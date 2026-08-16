@@ -31,7 +31,10 @@ kotlin {
             implementation(project(":kmm:data:wallet-api"))
             implementation(project(":kmm:data:upload-api"))
             implementation(project(":kmm:data:review-api"))
-            
+            implementation(project(":kmm:data:favorites-api"))
+            implementation(project(":kmm:data:profile-api"))
+            implementation(project(":kmm:data:notification-api"))
+
             implementation(project(":kmm:feature:home"))
             implementation(project(":kmm:feature:menu"))
             implementation(project(":kmm:feature:auth"))
@@ -40,7 +43,13 @@ kotlin {
             implementation(project(":kmm:feature:orders"))
             implementation(project(":kmm:feature:productDetails"))
             implementation(project(":kmm:feature:more"))
-            
+            implementation(project(":kmm:feature:catalog"))
+            implementation(project(":kmm:feature:search"))
+            implementation(project(":kmm:feature:settings"))
+            implementation(project(":kmm:feature:favorites"))
+            implementation(project(":kmm:feature:profile"))
+            implementation(project(":kmm:feature:notifications"))
+
             implementation(project(":kmm:library:data:cache"))
             implementation(project(":kmm:data:order-api"))
             

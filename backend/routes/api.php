@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClubPointController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\DeliveryController;
+use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
@@ -53,6 +54,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/categories', [ProductController::class, 'categories']);
     Route::get('/categories/featured', [CategoryController::class, 'featured']);
     Route::get('/categories/top', [CategoryController::class, 'top']);
+    Route::get('/categories/{id}/children', [CategoryController::class, 'children']);
     Route::get('/category/info/{slug}', [CategoryController::class, 'info']);
     Route::get('/filter/categories', [CategoryController::class, 'filterList']);
     Route::get('/filter/brands', fn () => response()->json([]));
@@ -64,6 +66,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/products/inhouse', [ProductController::class, 'inhouse']);
     Route::get('/products/todays-deal', [ProductController::class, 'todaysDeal']);
     Route::get('/products/search', [ProductController::class, 'search']);
+    Route::get('/products/filters', [ProductController::class, 'filterOptions']);
     Route::get('/products/last-viewed', [ProductController::class, 'lastViewed']);
     Route::get('/products/category/{id}', [ProductController::class, 'categoryProducts']);
     Route::get('/products/brand/{slug}', [ProductController::class, 'brandProducts']);
@@ -115,6 +118,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/payment-types', [PaymentController::class, 'paymentTypes']);
     Route::post('/order/store', [PaymentController::class, 'orderStore']);
     Route::post('/payments/pay/cod', [PaymentController::class, 'payCod']);
+    Route::post('/payments/pay/cliq', [PaymentController::class, 'payCliq']);
     Route::post('/payments/pay/wallet', [PaymentController::class, 'payWallet']);
     Route::post('/payments/pay/manual', [PaymentController::class, 'payManual']);
     Route::get('/paypal/payment/url', [PaymentController::class, 'paypalUrl']);
@@ -180,6 +184,8 @@ Route::middleware(['set.locale'])->group(function () {
         // Orders
         Route::get('/orders', [OrderController::class, 'index']);
         Route::post('/orders', [OrderController::class, 'store']);
+        // Must stay above /orders/{order} so "active" is not read as an id.
+        Route::get('/orders/active', [OrderController::class, 'active']);
         Route::get('/orders/{order}', [OrderController::class, 'show']);
         Route::get('/orders/{order}/status', [OrderController::class, 'status']);
         Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
@@ -194,7 +200,8 @@ Route::middleware(['set.locale'])->group(function () {
         Route::get('/digital/purchased-list', [OrderController::class, 'digitalPurchasedList']);
 
         // Favorites
-        Route::get('/favorites', [ProductController::class, 'favorites']);
+        Route::get('/favorites', [FavoriteController::class, 'index']);
+        Route::post('/favorites/toggle', [FavoriteController::class, 'toggle']);
         Route::post('/products/{product}/favorite', [ProductController::class, 'toggleFavorite']);
         Route::get('/wishlists', [WishlistController::class, 'index']);
         Route::delete('/wishlists/{wishlist_id}', [WishlistController::class, 'delete']);
@@ -206,6 +213,7 @@ Route::middleware(['set.locale'])->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
         Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
         Route::post('/notifications/bulk-delete', [NotificationController::class, 'bulkDelete']);
         Route::get('/all-notification', [NotificationController::class, 'index']);
         Route::get('/unread-notifications', [NotificationController::class, 'unreadCount']);

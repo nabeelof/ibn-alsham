@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.icons.extended)
     implementation(libs.compose.material3)
     implementation(libs.navigation.compose)
     implementation(libs.coil.compose)

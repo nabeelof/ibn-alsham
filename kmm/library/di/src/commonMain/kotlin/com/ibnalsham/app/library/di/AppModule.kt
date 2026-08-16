@@ -1,55 +1,74 @@
 package com.ibnalsham.app.library.di
 
+import com.ibnalsham.app.data.address.AddressRepository
+import com.ibnalsham.app.data.address.NetworkAddressRepository
 import com.ibnalsham.app.data.auth.AuthRepository
 import com.ibnalsham.app.data.auth.NetworkAuthRepository
 import com.ibnalsham.app.data.cart.CartApiRepository
 import com.ibnalsham.app.data.cart.NetworkCartApiRepository
 import com.ibnalsham.app.data.catalog.CatalogRepository
 import com.ibnalsham.app.data.catalog.NetworkCatalogRepository
+import com.ibnalsham.app.data.coupon.CouponRepository
+import com.ibnalsham.app.data.coupon.NetworkCouponRepository
+import com.ibnalsham.app.data.favorites.FavoritesRepository
+import com.ibnalsham.app.data.favorites.NetworkFavoritesRepository
 import com.ibnalsham.app.data.home.HomeRepository
 import com.ibnalsham.app.data.home.NetworkHomeRepository
 import com.ibnalsham.app.data.menu.MenuRepository
 import com.ibnalsham.app.data.menu.NetworkMenuRepository
+import com.ibnalsham.app.data.notification.NetworkNotificationRepository
+import com.ibnalsham.app.data.notification.NotificationRepository
+import com.ibnalsham.app.data.order.NetworkOrderRepository
+import com.ibnalsham.app.data.order.OrderRepository
 import com.ibnalsham.app.data.payment.NetworkPaymentRepository
 import com.ibnalsham.app.data.payment.PaymentRepository
 import com.ibnalsham.app.data.product.NetworkProductRepository
 import com.ibnalsham.app.data.product.ProductRepository
-import com.ibnalsham.app.data.search.NetworkSearchRepository
-import com.ibnalsham.app.data.search.SearchRepository
-import com.ibnalsham.app.data.address.AddressRepository
-import com.ibnalsham.app.data.address.NetworkAddressRepository
-import com.ibnalsham.app.data.coupon.CouponRepository
-import com.ibnalsham.app.data.coupon.NetworkCouponRepository
-import com.ibnalsham.app.data.settings.NetworkSettingsRepository
-import com.ibnalsham.app.data.settings.SettingsRepository
-import com.ibnalsham.app.data.wallet.NetworkWalletRepository
-import com.ibnalsham.app.data.wallet.WalletRepository
-import com.ibnalsham.app.data.upload.NetworkUploadRepository
-import com.ibnalsham.app.data.upload.UploadRepository
+import com.ibnalsham.app.data.profile.NetworkProfileRepository
+import com.ibnalsham.app.data.profile.ProfileRepository
 import com.ibnalsham.app.data.review.NetworkReviewRepository
 import com.ibnalsham.app.data.review.ReviewRepository
-import com.ibnalsham.app.library.data.network.createHttpClient
-import com.ibnalsham.app.library.data.network.networkJson
-import com.ibnalsham.app.data.order.OrderRepository
-import com.ibnalsham.app.data.order.NetworkOrderRepository
-import com.ibnalsham.app.library.data.cache.CartRepository
-import com.ibnalsham.app.library.data.cache.InMemoryCartRepository
-import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
-import com.ibnalsham.app.library.data.cache.InMemoryUserPreferencesRepository
-import com.ibnalsham.app.feature.home.presentation.viewModel.HomeViewModel
-import com.ibnalsham.app.feature.menu.presentation.viewModel.MenuViewModel
+import com.ibnalsham.app.data.search.NetworkSearchRepository
+import com.ibnalsham.app.data.search.SearchRepository
+import com.ibnalsham.app.data.settings.NetworkSettingsRepository
+import com.ibnalsham.app.data.settings.SettingsRepository
+import com.ibnalsham.app.data.upload.NetworkUploadRepository
+import com.ibnalsham.app.data.upload.UploadRepository
+import com.ibnalsham.app.data.wallet.NetworkWalletRepository
+import com.ibnalsham.app.data.wallet.WalletRepository
 import com.ibnalsham.app.feature.auth.presentation.viewModel.AuthViewModel
 import com.ibnalsham.app.feature.cart.presentation.viewModel.CartViewModel
+import com.ibnalsham.app.feature.catalog.presentation.viewModel.CatalogViewModel
 import com.ibnalsham.app.feature.checkout.presentation.viewModel.CheckoutViewModel
+import com.ibnalsham.app.feature.favorites.presentation.viewModel.FavoritesViewModel
+import com.ibnalsham.app.feature.home.presentation.viewModel.HomeViewModel
+import com.ibnalsham.app.feature.menu.presentation.viewModel.MenuViewModel
+import com.ibnalsham.app.feature.more.presentation.viewModel.MoreViewModel
+import com.ibnalsham.app.feature.notifications.presentation.viewModel.NotificationsViewModel
 import com.ibnalsham.app.feature.orders.presentation.viewModel.OrdersViewModel
 import com.ibnalsham.app.feature.productDetails.presentation.viewModel.ProductDetailsViewModel
-import com.ibnalsham.app.feature.more.presentation.viewModel.MoreViewModel
+import com.ibnalsham.app.feature.profile.presentation.viewModel.ProfileViewModel
+import com.ibnalsham.app.feature.search.presentation.viewModel.SearchViewModel
+import com.ibnalsham.app.feature.settings.presentation.viewModel.SettingsViewModel
+import com.ibnalsham.app.library.data.cache.AppPreferences
+import com.ibnalsham.app.library.data.cache.PlatformInfo
+import com.ibnalsham.app.library.data.cache.createPlatformInfo
+import com.ibnalsham.app.library.data.cache.CartRepository
+import com.ibnalsham.app.library.data.cache.InMemoryCartRepository
+import com.ibnalsham.app.library.data.cache.InMemoryUserPreferencesRepository
+import com.ibnalsham.app.library.data.cache.SessionManager
+import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
+import com.ibnalsham.app.library.data.network.createHttpClient
+import com.ibnalsham.app.library.data.network.networkJson
 import org.koin.dsl.module
 
 val appModule = module {
     // Infrastructure
     single { networkJson }
     single<UserPreferencesRepository> { InMemoryUserPreferencesRepository() }
+    single { SessionManager(get()) }
+    single { AppPreferences(get()) }
+    single<PlatformInfo> { createPlatformInfo() }
     single { createHttpClient(get(), get()) }
     single<CartRepository> { InMemoryCartRepository() }
 
@@ -69,14 +88,23 @@ val appModule = module {
     single<WalletRepository> { NetworkWalletRepository(get()) }
     single<UploadRepository> { NetworkUploadRepository(get()) }
     single<ReviewRepository> { NetworkReviewRepository(get()) }
+    single<FavoritesRepository> { NetworkFavoritesRepository(get()) }
+    single<ProfileRepository> { NetworkProfileRepository(get()) }
+    single<NotificationRepository> { NetworkNotificationRepository(get()) }
 
     // ViewModels
-    factory { HomeViewModel(get(), get(), get(), get()) }
+    factory { HomeViewModel(get(), get(), get(), get(), get()) }
     factory { MenuViewModel(get(), get(), get()) }
     factory { AuthViewModel(get(), get()) }
     factory { CartViewModel(get()) }
-    factory { CheckoutViewModel(get(), get()) }
-    factory { OrdersViewModel(get()) }
-    factory { ProductDetailsViewModel(get()) }
+    factory { CheckoutViewModel(get(), get(), get(), get()) }
+    factory { OrdersViewModel(get(), get()) }
+    factory { ProductDetailsViewModel(get(), get(), get(), get()) }
     factory { MoreViewModel(get()) }
+    factory { CatalogViewModel(get()) }
+    factory { SearchViewModel(get()) }
+    factory { FavoritesViewModel(get(), get(), get()) }
+    factory { ProfileViewModel(get(), get(), get()) }
+    factory { NotificationsViewModel(get(), get()) }
+    factory { SettingsViewModel(get(), get()) }
 }

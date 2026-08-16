@@ -121,5 +121,8 @@ class DatabaseSeeder extends Seeder
             'link_value' => $catShawarma->id,
             'sort_order' => 2,
         ]);
+
+        // 6. Coupons
+        $this->call(CouponSeeder::class);
     }
 }

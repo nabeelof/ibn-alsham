@@ -18,17 +18,51 @@ class CategoryController extends Controller
     {
         $locale = app()->getLocale();
 
-        $categories = Category::active()->ordered()
+        $categories = Category::active()->roots()->ordered()
+            ->with(['children' => fn ($q) => $q->withCount('activeProducts')])
             ->withCount('activeProducts')
             ->get()
             ->map(fn ($c) => [
                 'id' => $c->id,
+                'parent_id' => null,
                 'name' => $locale === 'ar' ? $c->name_ar : $c->name_en,
                 'image' => $c->image_url,
                 'products_count' => $c->active_products_count,
+                'children' => $c->children->map(fn ($child) => [
+                    'id' => $child->id,
+                    'parent_id' => $c->id,
+                    'name' => $locale === 'ar' ? $child->name_ar : $child->name_en,
+                    'image' => $child->image_url,
+                    'products_count' => $child->active_products_count,
+                    'children' => [],
+                ])->values(),
             ]);
 
         return $this->success($categories);
+    }
+
+    /**
+     * Subcategories of a category.
+     */
+    public function children(int $id): JsonResponse
+    {
+        $locale = app()->getLocale();
+
+        $children = Category::where('parent_id', $id)
+            ->where('is_active', true)
+            ->withCount('activeProducts')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'parent_id' => $id,
+                'name' => $locale === 'ar' ? $c->name_ar : $c->name_en,
+                'image' => $c->image_url,
+                'products_count' => $c->active_products_count,
+                'children' => [],
+            ]);
+
+        return $this->success($children);
     }
 
     /**
@@ -37,11 +71,12 @@ class CategoryController extends Controller
     public function products(int $categoryId): JsonResponse
     {
         $locale = app()->getLocale();
-        $userId = request()->user()?->id;
+        $userId = auth('sanctum')->id();
 
         $category = Category::findOrFail($categoryId);
 
-        $products = $category->activeProducts()
+        $products = \App\Models\Product::where('is_available', true)
+            ->inCategoryTree($categoryId)
             ->orderBy('sort_order')
             ->get()
             ->map(fn ($p) => [

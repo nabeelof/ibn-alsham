@@ -1,11 +1,12 @@
 package com.ibnalsham.app.data.home
 
 import com.ibnalsham.app.core.common.AppResult
-import com.ibnalsham.app.library.data.network.BaseResponse
 import com.ibnalsham.app.data.network.error.DomainError
+import com.ibnalsham.app.feature.domain.ActiveOrderDomain
 import com.ibnalsham.app.feature.domain.BannerDomain
 import com.ibnalsham.app.feature.domain.CategoryDomain
 import com.ibnalsham.app.feature.domain.ProductDomain
+import com.ibnalsham.app.library.data.network.BaseResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -21,11 +22,13 @@ data class HomeDataDomain(
     val categories: ImmutableList<CategoryDomain>,
     val featuredProducts: ImmutableList<ProductDomain>,
     val specialOffers: ImmutableList<ProductDomain>,
-    val announcement: String?
+    val mostOrdered: ImmutableList<ProductDomain>,
+    val activeOrder: ActiveOrderDomain?,
+    val announcement: String?,
 )
 
 class NetworkHomeRepository(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
 ) : HomeRepository {
 
     override suspend fun getHomeData(): AppResult<DomainError, HomeDataDomain> {
@@ -47,26 +50,8 @@ class NetworkHomeRepository(
         categories = categories.map { it.toDomain() }.toImmutableList(),
         featuredProducts = featuredProducts.map { it.toDomain() }.toImmutableList(),
         specialOffers = specialOffers.map { it.toDomain() }.toImmutableList(),
-        announcement = announcement
-    )
-
-    private fun BannerDto.toDomain() = BannerDomain(
-        id = id,
-        imageUrl = imageUrl,
-        title = title
-    )
-
-    private fun CategoryDto.toDomain() = CategoryDomain(
-        id = id,
-        name = name,
-        image = icon
-    )
-
-    private fun ProductDto.toDomain() = ProductDomain(
-        id = id,
-        name = name,
-        price = price,
-        image = imageUrl,
-        categoryName = categoryName,
+        mostOrdered = mostOrdered.map { it.toDomain() }.toImmutableList(),
+        activeOrder = activeOrder?.toDomain(),
+        announcement = announcement,
     )
 }

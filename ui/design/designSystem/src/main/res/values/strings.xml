@@ -12,4 +12,152 @@
     <string name="nav_menu">Menu</string>
     <string name="nav_orders">Orders</string>
     <string name="nav_more">More</string>
+
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="apply">Apply</string>
+    <string name="remove">Remove</string>
+    <string name="close">Close</string>
+    <string name="search">Search</string>
+    <string name="login_required">Please sign in to continue</string>
+    <string name="login">Sign in</string>
+    <string name="something_went_wrong">Something went wrong</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">Search the menu…</string>
+    <string name="home_special_offers">Special offers</string>
+    <string name="home_best_sellers">Best sellers</string>
+    <string name="home_featured">Featured</string>
+    <string name="home_categories">Categories</string>
+    <string name="home_all">All</string>
+    <string name="active_order_title">Your current order</string>
+    <string name="active_order_track">Track order</string>
+    <string name="active_order_eta">About %1$d min</string>
+
+    <!-- Offers -->
+    <string name="offer_percent_off">%1$d%% off</string>
+    <string name="offer_amount_off">%1$s off</string>
+
+    <!-- Product -->
+    <string name="product_add_to_cart">Add to cart</string>
+    <string name="product_required">Required</string>
+    <string name="product_optional">Optional</string>
+    <string name="product_free">Free</string>
+    <string name="product_choose_one">Choose one</string>
+    <string name="product_choose_up_to">Choose up to %1$d</string>
+    <string name="product_choose_at_least">Choose at least %1$d</string>
+    <string name="product_share">Share</string>
+    <string name="product_add_to_favorites">Add to favorites</string>
+    <string name="product_remove_from_favorites">Remove from favorites</string>
+    <string name="product_share_message">Check out %1$s at Ibn Alsham: %2$s</string>
+    <string name="product_sold_out">Sold out</string>
+
+    <!-- Cart -->
+    <string name="cart_title">Cart</string>
+    <string name="cart_empty">Your cart is empty</string>
+    <string name="cart_edit_addons">Edit add-ons</string>
+    <string name="cart_addons">Add-ons</string>
+    <string name="cart_subtotal">Subtotal</string>
+    <string name="cart_clear">Clear cart</string>
+    <string name="cart_items_suffix">items</string>
+    <string name="cart_checkout">Checkout</string>
+
+    <!-- Checkout -->
+    <string name="checkout_title">Checkout</string>
+    <string name="checkout_delivery">Delivery</string>
+    <string name="checkout_pickup">Pick-up</string>
+    <string name="checkout_payment_method">Payment method</string>
+    <string name="checkout_coupon">Discount coupon</string>
+    <string name="checkout_coupon_hint">Enter coupon code</string>
+    <string name="checkout_coupon_applied">Coupon %1$s applied</string>
+    <string name="checkout_available_coupons">Available coupons</string>
+    <string name="checkout_discount">Discount</string>
+    <string name="checkout_delivery_fee">Delivery fee</string>
+    <string name="checkout_total">Total</string>
+    <string name="checkout_notes">Order notes</string>
+    <string name="checkout_cliq_alias">Transfer to CliQ alias: %1$s</string>
+    <string name="checkout_payment_reference">Transfer reference</string>
+    <string name="place_order">Place order · %1$s</string>
+
+    <!-- Search -->
+    <string name="search_title">Search</string>
+    <string name="search_filters">Filters</string>
+    <string name="search_filter_category">Category</string>
+    <string name="search_filter_price">Price range (JOD)</string>
+    <string name="search_filter_min">Min</string>
+    <string name="search_filter_max">Max</string>
+    <string name="search_filter_only_offers">Offers only</string>
+    <string name="search_filter_only_featured">Featured only</string>
+    <string name="search_filter_sort">Sort by</string>
+    <string name="search_sort_default">Recommended</string>
+    <string name="search_sort_price_asc">Price: low to high</string>
+    <string name="search_sort_price_desc">Price: high to low</string>
+    <string name="search_sort_newest">Newest</string>
+    <string name="search_sort_best_selling">Best selling</string>
+    <string name="search_clear_filters">Clear filters</string>
+    <string name="search_no_results">No results found</string>
+    <string name="search_start_hint">Search for a dish or a category</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">Favorites</string>
+    <string name="favorites_empty">You have no favorites yet</string>
+    <string name="favorites_browse_menu">Browse the menu</string>
+
+    <!-- Profile -->
+    <string name="profile_title">My profile</string>
+    <string name="profile_name">Name</string>
+    <string name="profile_phone">Phone number</string>
+    <string name="profile_orders_count">Orders</string>
+    <string name="profile_favorites_count">Favorites</string>
+    <string name="profile_delete_account">Delete account</string>
+    <string name="profile_delete_confirm">Delete your account permanently? This cannot be undone.</string>
+    <string name="profile_logout">Sign out</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_empty">No notifications yet</string>
+    <string name="notifications_mark_all_read">Mark all read</string>
+    <string name="notifications_clear_all">Clear all</string>
+
+    <!-- Guest gating -->
+    <string name="gate_eyebrow">Members only</string>
+    <string name="gate_sign_in">Sign in</string>
+    <string name="gate_continue_browsing">Keep browsing</string>
+    <string name="gate_guest_name">Guest</string>
+    <string name="gate_guest_subtitle">Sign in to unlock your account</string>
+
+    <string name="gate_favorites_title">Save what you love</string>
+    <string name="gate_favorites_message">Sign in to keep your favourite dishes on every device.</string>
+    <string name="gate_orders_title">Track your orders</string>
+    <string name="gate_orders_message">Sign in to follow live orders and reorder past ones in a tap.</string>
+    <string name="gate_profile_title">Your account</string>
+    <string name="gate_profile_message">Sign in to manage your details, addresses and preferences.</string>
+    <string name="gate_checkout_title">Almost there</string>
+    <string name="gate_checkout_message">Sign in to place your order — your cart is saved and waiting.</string>
+    <string name="gate_notifications_title">Stay in the loop</string>
+    <string name="gate_notifications_message">Sign in to get order updates and offers made for you.</string>
+    <string name="gate_reviews_title">Share your take</string>
+    <string name="gate_reviews_message">Sign in to rate the dishes you have ordered.</string>
+    <string name="gate_addresses_title">Save your addresses</string>
+    <string name="gate_addresses_message">Sign in to check out faster with saved delivery addresses.</string>
+    <string name="gate_wallet_title">Your wallet</string>
+    <string name="gate_wallet_message">Sign in to see your balance and credits.</string>
+
+    <!-- Shared states -->
+    <string name="error_generic_title">Something went wrong</string>
+    <string name="error_generic_message">Check your connection and try again.</string>
+    <string name="action_retry">Try again</string>
+    <string name="action_browse_menu">Browse the menu</string>
+
+    <!-- Greetings -->
+    <string name="greeting_guest">Hungry?</string>
+    <string name="greeting_named">Hey, %1$s</string>
+    <string name="greeting_subtitle">What are we eating today?</string>
+    <string name="favorites_empty_message">Tap the heart on any dish to keep it here.</string>
+    <string name="notifications_empty_message">Order updates and offers will show up here.</string>
+    <string name="orders_empty_title">No orders yet</string>
+    <string name="orders_empty_message">Once you place an order it will appear here.</string>
+    <string name="notifications_unread_count">%1$d unread</string>
 </resources>

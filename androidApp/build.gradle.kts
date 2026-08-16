@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -23,11 +24,26 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // No release keystore yet — see PROFILE_BUILD notes in the README.
+        }
+
+        /*
+         * Release-like build for performance testing and internal distribution:
+         * R8-optimised and non-debuggable, but signed with the debug key so it
+         * installs on any device without the (not yet created) release keystore.
+         */
+        create("profile") {
+            initWith(getByName("release"))
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            versionNameSuffix = "-profile"
         }
     }
     compileOptions {
@@ -48,6 +64,11 @@ android {
 }
 
 dependencies {
+    // Firebase Cloud Messaging for order/promotion push notifications.
+    // Configured by androidApp/google-services.json (project ibn-alsham-a0d8e).
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+    implementation("com.google.firebase:firebase-messaging-ktx")
+
     implementation(project(":kmm:library:di"))
     implementation(project(":ui:design:designSystem"))
     
@@ -63,10 +84,17 @@ dependencies {
     implementation(project(":ui:feature:search-impl"))
     implementation(project(":ui:feature:productDetails-impl"))
     implementation(project(":ui:feature:more-impl"))
+    implementation(project(":ui:feature:settings-impl"))
+    implementation(project(":ui:feature:favorites-impl"))
+    implementation(project(":ui:feature:profile-impl"))
+    implementation(project(":ui:feature:notifications-impl"))
     implementation(libs.compose.icons.extended)
     implementation(project(":ui:design:designSystem"))
 
     implementation(project(":kmm:feature:navigation"))
+    implementation(project(":kmm:data:notification-api"))
+    implementation(project(":kmm:library:data:cache"))
+    implementation(project(":kmm:library:core:common"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

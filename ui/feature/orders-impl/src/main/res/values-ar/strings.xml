@@ -25,4 +25,6 @@
     <string name="submit">إرسال</string>
     <string name="cancel_order">إلغاء الطلب</string>
     <string name="order_notes_placeholder">أضف ملاحظة (اختياري)</string>
+    <string name="order_cancelled_message">تم إلغاء الطلب</string>
+    <string name="review_thanks_message">شكراً لتقييمك!</string>
 </resources>

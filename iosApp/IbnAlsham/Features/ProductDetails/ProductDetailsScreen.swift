@@ -62,12 +62,12 @@ struct ProductDetailsScreen: View {
                                         .foregroundColor(.black)
                                     Spacer()
                                     VStack(alignment: .trailing, spacing: 2) {
-                                        Text(String(format: "%.3f JOD", viewModel.uiState.effectivePrice))
+                                        Text(JodPrice.format(viewModel.uiState.effectivePrice))
                                             .font(.system(size: 20, weight: .bold))
                                             .foregroundColor(Color(hex: "C62828"))
                                         
                                         if viewModel.uiState.basePrice > viewModel.uiState.effectivePrice {
-                                            Text(String(format: "%.3f JOD", viewModel.uiState.basePrice))
+                                            Text(JodPrice.format(viewModel.uiState.basePrice))
                                                 .font(.system(size: 14))
                                                 .foregroundColor(.gray)
                                                 .strikethrough()
@@ -84,38 +84,26 @@ struct ProductDetailsScreen: View {
                             
                             Rectangle().fill(Color(hex: "EEEEEE")).frame(height: 8)
                             
-                            // Options
-                            if !viewModel.uiState.options.isEmpty {
+                            // Add-on groups: radio when a single choice is allowed,
+                            // checkboxes otherwise, with the admin's rule spelled out.
+                            if !viewModel.uiState.optionGroups.isEmpty {
                                 VStack(alignment: .leading, spacing: 16) {
                                     Text("خيارات إضافية")
                                         .font(.system(size: 18, weight: .bold))
-                                    
-                                    ForEach(viewModel.uiState.options, id: \.id) { option in
-                                        Button(action: {
-                                            viewModel.dispatch(action: ProductDetailsViewModelContractActionToggleOption(optionId: option.id))
-                                        }) {
-                                            HStack {
-                                                Image(systemName: viewModel.uiState.selectedOptionIds.contains(option.id as NSNumber) ? "checkmark.square.fill" : "square")
-                                                    .foregroundColor(viewModel.uiState.selectedOptionIds.contains(option.id as NSNumber) ? Color(hex: "C62828") : .gray)
-                                                    .font(.system(size: 20))
-                                                
-                                                Text(option.name)
-                                                    .foregroundColor(.black)
-                                                    .font(.system(size: 16))
-                                                
-                                                Spacer()
-                                                
-                                                if option.price > 0 {
-                                                    Text(String(format: "+%.3f JOD", option.price))
-                                                        .foregroundColor(Color(hex: "C62828"))
-                                                        .font(.system(size: 14, weight: .semibold))
-                                                } else if option.isRequired {
-                                                    Text("إلزامي")
-                                                        .foregroundColor(.gray)
-                                                        .font(.system(size: 12))
-                                                }
-                                            }
-                                            .padding(.vertical, 8)
+
+                                    ForEach(viewModel.uiState.optionGroups, id: \.id) { group in
+                                        OptionGroupSection(
+                                            group: group,
+                                            selectedIds: viewModel.uiState.selectedOptionIds,
+                                            isUnsatisfied: viewModel.uiState.unsatisfiedGroupIds
+                                                .contains(KotlinInt(int: group.id))
+                                        ) { optionId in
+                                            viewModel.dispatch(
+                                                action: ProductDetailsViewModelContractActionToggleOption(
+                                                    groupId: group.id,
+                                                    optionId: optionId
+                                                )
+                                            )
                                         }
                                     }
                                 }
@@ -160,7 +148,7 @@ struct ProductDetailsScreen: View {
                                 if viewModel.uiState.isAddingToCart {
                                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
                                 } else {
-                                    Text(String(format: "إضافة • %.3f JOD", viewModel.uiState.calculatedTotal))
+                                    Text("إضافة • " + JodPrice.format(viewModel.uiState.calculatedTotal))
                                         .font(.system(size: 16, weight: .bold))
                                 }
                             }
@@ -182,5 +170,73 @@ struct ProductDetailsScreen: View {
         .onAppear {
             viewModel.dispatch(action: ProductDetailsViewModelContractActionViewReady(productId: productId))
         }
+    }
+}
+
+
+/// One add-on group rendered with the right control and its selection rule.
+private struct OptionGroupSection: View {
+    let group: OptionGroupDomain
+    let selectedIds: Set<KotlinInt>
+    let isUnsatisfied: Bool
+    let onToggle: (Int32) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Text(group.name).font(.system(size: 16, weight: .semibold))
+                Text(group.isRequired ? "إلزامي" : "اختياري")
+                    .font(.system(size: 11, weight: .semibold))
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background((group.isRequired ? Color(hex: "C62828") : Color.gray).opacity(0.12))
+                    .foregroundColor(group.isRequired ? Color(hex: "C62828") : .gray)
+                    .cornerRadius(6)
+            }
+
+            if let rule = ruleText {
+                Text(rule)
+                    .font(.system(size: 12))
+                    .foregroundColor(isUnsatisfied ? Color(hex: "C62828") : .gray)
+            }
+
+            ForEach(group.options, id: \.id) { option in
+                Button {
+                    onToggle(option.id)
+                } label: {
+                    HStack {
+                        Image(systemName: iconName(for: option))
+                            .foregroundColor(
+                                selectedIds.contains(KotlinInt(int: option.id)) ? Color(hex: "C62828") : .gray
+                            )
+                            .font(.system(size: 20))
+
+                        Text(option.name).foregroundColor(.black).font(.system(size: 16))
+
+                        Spacer()
+
+                        Text(option.isFree ? "مجاناً" : JodPrice.formatSigned(option.price))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(option.isFree ? Color(hex: "2E7D32") : Color(hex: "C62828"))
+                    }
+                    .padding(.vertical, 8)
+                }
+                .disabled(!option.isUserChangeable)
+            }
+        }
+    }
+
+    private var ruleText: String? {
+        if group.isSingleChoice { return "اختر واحداً" }
+        if let max = group.maxSelections { return "اختر حتى \(max)" }
+        if group.minSelections > 0 { return "اختر \(group.minSelections) على الأقل" }
+        return nil
+    }
+
+    private func iconName(for option: OptionDomain) -> String {
+        let selected = selectedIds.contains(KotlinInt(int: option.id))
+        if group.isSingleChoice {
+            return selected ? "largecircle.fill.circle" : "circle"
+        }
+        return selected ? "checkmark.square.fill" : "square"
     }
 }

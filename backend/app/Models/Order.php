@@ -19,7 +19,12 @@ class Order extends Model
         'lng',
         'distance_km',
         'notes',
+        'coupon_id',
+        'coupon_code',
+        'discount_amount',
         'payment_method',
+        'payment_status',
+        'payment_reference',
         'confirmed_at',
         'estimated_time',
         'cancellation_deadline',
@@ -35,6 +40,7 @@ class Order extends Model
         return [
             'subtotal' => 'decimal:3',
             'delivery_fee' => 'decimal:3',
+            'discount_amount' => 'decimal:3',
             'total' => 'decimal:3',
             'lat' => 'decimal:7',
             'lng' => 'decimal:7',
@@ -56,6 +62,11 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
     }
 
     // ─── Scopes ──────────────────────────────────────────────

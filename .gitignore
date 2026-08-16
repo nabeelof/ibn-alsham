@@ -99,3 +99,7 @@ backend/auth.json
 # Agents
 .agents/
 .claude/
+
+# Firebase service account private key — never commit
+backend/storage/firebase-adminsdk.json
+**/firebase-adminsdk*.json

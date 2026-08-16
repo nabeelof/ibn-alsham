@@ -18,6 +18,12 @@ class SharedPreferencesUserPreferencesRepository(context: Context) : UserPrefere
         prefs.edit().putBoolean("home_categories_as_tabs", enabled).apply()
     }
 
+    override fun getThemeMode(): String? = prefs.getString("theme_mode", null)
+
+    override fun saveThemeMode(mode: String) {
+        prefs.edit().putString("theme_mode", mode).apply()
+    }
+
     override fun getAuthToken(): String? = prefs.getString("auth_token", null)
 
     override fun saveAuthToken(token: String) {

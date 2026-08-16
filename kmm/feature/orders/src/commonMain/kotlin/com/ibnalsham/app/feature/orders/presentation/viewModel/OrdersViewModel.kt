@@ -6,17 +6,21 @@ import com.ibnalsham.app.data.order.OrderRepository
 import com.ibnalsham.app.data.order.OrderResponseDto
 import com.ibnalsham.app.feature.domain.OrderDomain
 import com.ibnalsham.app.feature.domain.OrderStatus
+import com.ibnalsham.app.library.data.cache.SessionManager
 import com.ibnalsham.app.presentation.mvi.KMMViewModel
 import com.ibnalsham.app.presentation.mvi.MVI
 import com.ibnalsham.app.presentation.mvi.mvi
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class OrdersViewModel(
     private val orderRepository: OrderRepository,
+    private val sessionManager: SessionManager,
 ) : KMMViewModel(),
     MVI<OrdersViewModelContract.MyUiState, OrdersViewModelContract.Action, OrdersViewModelContract.SideEffect>
     by mvi(OrdersViewModelContract.MyUiState.defaultInstance()) {
@@ -25,10 +29,13 @@ class OrdersViewModel(
 
     override fun onAction(event: OrdersViewModelContract.Action) {
         when (event) {
-            OrdersViewModelContract.Action.ViewReady -> loadOrders()
+            OrdersViewModelContract.Action.ViewReady -> observeSession()
             is OrdersViewModelContract.Action.SelectTab -> {
                 updateState { copy(selectedTab = event.tab) }
                 loadOrders()
+            }
+            OrdersViewModelContract.Action.SignInClicked -> viewModelScope.launch {
+                emitEffect { OrdersViewModelContract.SideEffect.RequireSignIn }
             }
             is OrdersViewModelContract.Action.OrderClicked -> {
                 viewModelScope.launch {
@@ -44,7 +51,37 @@ class OrdersViewModel(
         }
     }
 
+    /**
+     * Orders belong to an account. This tab used to load unconditionally, so a
+     * guest tapping it got a bare error; now they get the sign-in state instead.
+     */
+    private fun observeSession() {
+        viewModelScope.launch {
+            sessionManager.session.collectLatest { session ->
+                if (session.isSignedIn) {
+                    updateState { copy(isGuest = false) }
+                    loadOrders()
+                } else {
+                    stopTracking()
+                    updateState {
+                        copy(
+                            isGuest = true,
+                            isLoading = false,
+                            error = null,
+                            currentOrders = persistentListOf(),
+                            previousOrders = persistentListOf(),
+                            activeOrder = null,
+                            orderPhase = OrderPhase.NONE,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun loadOrders() {
+        if (!sessionManager.isSignedIn) return
+
         viewModelScope.launch {
             updateState { copy(isLoading = true, error = null) }
 

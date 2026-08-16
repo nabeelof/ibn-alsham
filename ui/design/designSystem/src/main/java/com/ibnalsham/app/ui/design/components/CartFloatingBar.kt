@@ -1,108 +1,135 @@
 package com.ibnalsham.app.ui.design.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.rounded.ShoppingBag
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ibnalsham.app.ui.design.designSystem.R
+import com.ibnalsham.app.ui.design.motion.bouncyClickable
+import com.ibnalsham.app.ui.design.theme.AppTextStyles
+import com.ibnalsham.app.ui.design.theme.AppTheme
+import com.ibnalsham.app.ui.design.theme.Motion
+import com.ibnalsham.app.ui.design.theme.Spacing
 
+/**
+ * Cart summary that slides up as soon as the cart stops being empty.
+ *
+ * The total counts up rather than snapping (see [AnimatedPrice]) so adding an
+ * item visibly moves the number the user is deciding on.
+ */
 @Composable
 fun CartFloatingBar(
     itemCount: Int,
     subtotal: Double,
-    currency: String? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = AppTheme.colors
+
     AnimatedVisibility(
         visible = itemCount > 0,
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it },
+        enter = slideInVertically(Motion.offsetSpring()) { it } + fadeIn(Motion.fadeIn()),
+        exit = slideOutVertically(Motion.offsetSpring()) { it } + fadeOut(Motion.fadeOut()),
+        modifier = modifier,
     ) {
-        Surface(
-            modifier = modifier.fillMaxWidth().padding(12.dp),
-            shape = RoundedCornerShape(14.dp),
-            color = Color(0xFFC62828),
-            shadowElevation = 8.dp,
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = Spacing.gutter, vertical = Spacing.md)
+                .shadow(
+                    elevation = 16.dp,
+                    shape = CircleShape,
+                    ambientColor = colors.brand.copy(alpha = 0.5f),
+                    spotColor = colors.brand.copy(alpha = 0.5f),
+                )
+                .clip(CircleShape)
+                .background(Brush.horizontalGradient(listOf(colors.brandDeep, colors.brand)))
+                .bouncyClickable(pressedScale = 0.98f, onClick = onClick)
+                .padding(horizontal = Spacing.md, vertical = Spacing.md),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Button(
-                onClick = onClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFC62828),
-                    contentColor = Color.White,
-                ),
-                shape = RoundedCornerShape(14.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                    horizontal = 16.dp,
-                    vertical = 14.dp,
-                ),
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.18f)),
+                contentAlignment = Alignment.Center,
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Box(
-                        modifier = Modifier.size(28.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ShoppingCart,
-                            contentDescription = null,
-                            tint = Color.White,
-                        )
-                        Surface(
-                            shape = CircleShape,
-                            color = Color.White,
-                            modifier = Modifier
-                                .size(16.dp)
-                                .align(Alignment.TopEnd),
-                        ) {
-                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                                Text(
-                                    text = itemCount.toString(),
-                                    color = Color(0xFFC62828),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 10.sp,
-                                )
-                            }
-                        }
-                    }
-                    Text(
-                        text = stringResource(R.string.view_cart),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                Icon(
+                    imageVector = Icons.Rounded.ShoppingBag,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+
+            Spacer(Modifier.width(Spacing.md))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.view_cart),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AnimatedCounter(
+                        value = itemCount,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White.copy(alpha = 0.85f),
                     )
+                    Spacer(Modifier.width(Spacing.xs))
                     Text(
-                        text = "${"%.2f".format(subtotal)} ${currency ?: stringResource(R.string.currency_symbol)}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        text = stringResource(R.string.cart_items_suffix),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White.copy(alpha = 0.85f),
                     )
                 }
             }
+
+            AnimatedPrice(
+                value = subtotal,
+                style = AppTextStyles.price,
+                color = Color.White,
+                modifier = Modifier.padding(end = Spacing.sm),
+            )
         }
+    }
+}
+
+/** Spacer that keeps scrollable content clear of the floating cart bar. */
+@Composable
+fun CartBarSpacer(visible: Boolean) {
+    AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+        Spacer(Modifier.height(96.dp))
     }
 }

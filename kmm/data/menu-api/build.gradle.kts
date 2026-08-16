@@ -19,8 +19,8 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":kmm:library:data:network"))
             implementation(project(":kmm:library:data:network-error"))
-            implementation(project(":kmm:data:home-api"))
-            implementation(project(":kmm:feature:domain"))
+            api(project(":kmm:data:home-api"))
+            api(project(":kmm:feature:domain"))
             implementation(project(":kmm:library:core:common"))
             implementation(libs.kotlinx.collections.immutable)
             

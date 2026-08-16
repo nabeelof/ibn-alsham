@@ -16,6 +16,7 @@ echo "=================================================="
 echo "🔄 Uploading only changed files to VPS..."
 rsync -avz --update --itemize-changes \
     --exclude '.env' \
+    --exclude '.env.production' \
     --exclude '.git' \
     --exclude 'vendor' \
     --exclude 'node_modules' \
@@ -33,6 +34,8 @@ ssh $REMOTE_HOST "cd $REMOTE_DIR && \
     chown -R www-data:www-data . && \
     chmod -R 775 storage bootstrap/cache && \
     sudo -u www-data php artisan optimize:clear && \
+    sudo -u www-data php artisan migrate --force && \
+    sudo -u www-data php artisan config:cache && \
     sudo -u www-data php artisan route:cache && \
     sudo -u www-data php artisan view:cache"
 

@@ -30,6 +30,7 @@ interface OrdersViewModelContract {
         data class StartTracking(val orderId: Int) : Action()
         data object StopTracking : Action()
         data object DismissReviewDialog : Action()
+        data object SignInClicked : Action()
     }
 
     enum class OrderTab { CURRENT, PREVIOUS }
@@ -49,9 +50,16 @@ interface OrdersViewModelContract {
         val reviewOrderId: Int? = null,
         val isSubmittingReview: Boolean = false,
         val isCancelling: Boolean = false,
+        val isGuest: Boolean = false,
     ) : UiState {
         val displayedOrders: ImmutableList<OrderDomain>
             get() = if (selectedTab == OrderTab.CURRENT) currentOrders else previousOrders
+
+        /** Guests have no order history to show — they get the sign-in state. */
+        val requiresLogin: Boolean get() = isGuest
+
+        val isEmpty: Boolean
+            get() = !isLoading && !isGuest && error == null && displayedOrders.isEmpty()
 
         companion object {
             fun defaultInstance() = MyUiState()
@@ -63,6 +71,9 @@ interface OrdersViewModelContract {
         data class ShowSnackbar(val message: String) : SideEffect()
         data object OrderCancelled : SideEffect()
         data object ReviewSubmitted : SideEffect()
+
+        /** Ask the host to raise the sign-in gate sheet. */
+        data object RequireSignIn : SideEffect()
     }
 }
 

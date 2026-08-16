@@ -8,13 +8,13 @@ import kotlinx.coroutines.launch
 import com.ibnalsham.app.data.auth.AuthRepository
 import com.ibnalsham.app.core.common.onSuccess
 import com.ibnalsham.app.core.common.onFailure
-import com.ibnalsham.app.library.data.cache.UserPreferencesRepository
+import com.ibnalsham.app.library.data.cache.SessionManager
 import com.ibnalsham.app.presentation.mvi.mvi
 
 class AuthViewModel(
     private val authRepository: AuthRepository,
-    private val userPreferencesRepository: UserPreferencesRepository,
-) : KMMViewModel(), 
+    private val sessionManager: SessionManager,
+) : KMMViewModel(),
     MVI<AuthViewModelContract.MyUiState, AuthViewModelContract.Action, AuthViewModelContract.SideEffect> 
     by mvi(AuthViewModelContract.MyUiState.defaultInstance()) {
 
@@ -64,9 +64,7 @@ class AuthViewModel(
             
             authRepository.verifyOtp(phone, otp).onSuccess { response ->
                 updateState { copy(isLoading = false) }
-                userPreferencesRepository.saveAuthToken(response.token)
-                userPreferencesRepository.saveUserName(response.user.name)
-                userPreferencesRepository.saveUserPhone(response.user.phone)
+                sessionManager.signIn(response.token, response.user.name, response.user.phone)
                 if (response.isNewUser) {
                     updateState { copy(step = AuthViewModelContract.AuthStep.REGISTER) }
                 } else {
@@ -89,9 +87,7 @@ class AuthViewModel(
             
             authRepository.register(phone, otp, name).onSuccess { response ->
                 updateState { copy(isLoading = false) }
-                userPreferencesRepository.saveAuthToken(response.token)
-                userPreferencesRepository.saveUserName(response.user.name)
-                userPreferencesRepository.saveUserPhone(response.user.phone)
+                sessionManager.signIn(response.token, response.user.name, response.user.phone)
                 emitEffect { AuthViewModelContract.SideEffect.NavigateToHome }
             }.onFailure { error ->
                 updateState { copy(isLoading = false, error = error) }

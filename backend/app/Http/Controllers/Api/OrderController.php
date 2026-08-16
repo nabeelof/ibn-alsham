@@ -35,11 +35,14 @@ class OrderController extends Controller
             'items.*.option_ids' => 'nullable|array',
             'items.*.option_ids.*' => 'exists:product_options,id',
             'notes' => 'nullable|string|max:1000',
+            'coupon_code' => 'nullable|string|max:64',
+            'payment_method' => 'nullable|string|exists:payment_methods,key',
+            'payment_reference' => 'nullable|string|max:120',
             // Delivery required fields
-            'delivery' => 'required_if:type,delivery|array',
-            'delivery.address' => 'required_if:type,delivery|string',
-            'delivery.lat' => 'required_if:type,delivery|numeric',
-            'delivery.lng' => 'required_if:type,delivery|numeric',
+            'delivery' => 'nullable|required_if:type,delivery|array',
+            'delivery.address' => 'nullable|required_if:type,delivery|string',
+            'delivery.lat' => 'nullable|required_if:type,delivery|numeric',
+            'delivery.lng' => 'nullable|required_if:type,delivery|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -52,7 +55,10 @@ class OrderController extends Controller
                 $request->type,
                 $request->items,
                 $request->delivery ?? [],
-                $request->notes
+                $request->notes,
+                $request->coupon_code,
+                $request->input('payment_method', 'cash'),
+                $request->payment_reference,
             );
 
             return $this->success(
@@ -85,7 +91,12 @@ class OrderController extends Controller
             'type' => $o->type,
             'status' => $o->status,
             'status_label' => $locale === 'ar' ? $o->status_label_ar : $o->status_label_en,
+            'subtotal' => $o->subtotal,
+            'delivery_fee' => $o->delivery_fee,
+            'discount_amount' => $o->discount_amount,
             'total' => $o->total,
+            'payment_method' => $o->payment_method,
+            'payment_status' => $o->payment_status,
             'item_count' => $o->items()->sum('quantity'),
             'created_at' => $o->created_at->format('Y-m-d H:i'),
             'can_cancel' => $o->can_cancel,
@@ -99,6 +110,30 @@ class OrderController extends Controller
         ]);
 
         return $this->success($orders);
+    }
+
+    /**
+     * The single in-flight order, used by the home screen status card.
+     */
+    public function active(Request $request): JsonResponse
+    {
+        $locale = app()->getLocale();
+        $order = $request->user()->orders()->current()->latest()->first();
+
+        if (!$order) {
+            return $this->success(null);
+        }
+
+        return $this->success([
+            'id' => $order->id,
+            'order_number' => $order->order_number,
+            'type' => $order->type,
+            'status' => $order->status,
+            'status_label' => $locale === 'ar' ? $order->status_label_ar : $order->status_label_en,
+            'total' => (float) $order->total,
+            'estimated_time' => $order->estimated_time,
+            'created_at' => $order->created_at->format('Y-m-d H:i'),
+        ]);
     }
 
     /**
@@ -295,10 +330,14 @@ class OrderController extends Controller
             'status_label' => $locale === 'ar' ? $order->status_label_ar : $order->status_label_en,
             'subtotal' => $order->subtotal,
             'delivery_fee' => $order->delivery_fee,
+            'discount_amount' => $order->discount_amount,
+            'coupon_code' => $order->coupon_code,
             'total' => $order->total,
             'address' => $order->address,
             'notes' => $order->notes,
             'payment_method' => $order->payment_method,
+            'payment_status' => $order->payment_status,
+            'payment_reference' => $order->payment_reference,
             'created_at' => $order->created_at->format('Y-m-d H:i'),
             'confirmed_at' => $order->confirmed_at?->format('Y-m-d H:i'),
             'estimated_time' => $order->estimated_time,

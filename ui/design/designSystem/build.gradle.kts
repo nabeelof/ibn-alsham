@@ -16,9 +16,21 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.material3)
+    api(project(":kmm:library:core:priceFormatter"))
+
+    // The sign-in gate reads session state and the GatedFeature copy keys.
+    api(project(":kmm:library:data:cache"))
+
+    // Product/category cards render domain models directly.
+    api(project(":kmm:feature:domain"))
+
+    // Feature modules consume the theme, motion and components from here, so the
+    // Compose surface has to stay on their compile classpath.
+    api(platform(libs.compose.bom))
+    api(libs.compose.ui)
+    api(libs.compose.ui.graphics)
+    api(libs.compose.material3)
+    api(libs.compose.icons.extended)
+    api(libs.coil.compose)
     implementation(libs.compose.ui.tooling.preview)
 }
-

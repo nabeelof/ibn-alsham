@@ -13,6 +13,7 @@ class OrderItem extends Model
         'product_name_en',
         'quantity',
         'unit_price',
+        'unit_cost',
         'discount_price',
         'options_total',
         'total',
@@ -22,6 +23,7 @@ class OrderItem extends Model
     {
         return [
             'unit_price' => 'decimal:3',
+            'unit_cost' => 'decimal:3',
             'discount_price' => 'decimal:3',
             'options_total' => 'decimal:3',
             'total' => 'decimal:3',

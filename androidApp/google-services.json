@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "276075686116",
+    "project_id": "ibn-alsham-a0d8e",
+    "storage_bucket": "ibn-alsham-a0d8e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276075686116:android:f7680e4c20c1b5915de4f1",
+        "android_client_info": {
+          "package_name": "com.ibnalsham.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_qPGOB8GesUSQjhRKkiDWnVSAyWlcbzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

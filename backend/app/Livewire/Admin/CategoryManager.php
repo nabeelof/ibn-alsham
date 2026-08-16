@@ -4,15 +4,15 @@ namespace App\Livewire\Admin;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\Layout;
+use App\Support\Permissions;
 use Livewire\Attributes\Rule;
-use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
-#[Layout('components.layouts.admin')]
-class CategoryManager extends Component
+class CategoryManager extends AdminPage
 {
+    protected string $permission = Permissions::CATEGORIES_MANAGE;
+
     use WithPagination, WithFileUploads;
 
     public string $search = '';
