@@ -1,0 +1,17 @@
+<resources>
+    <string name="login_title">تسجيل الدخول</string>
+    <string name="enter_phone_desc">الرجاء إدخال رقم هاتفك للمتابعة</string>
+    <string name="phone_label">رقم الهاتف</string>
+    <string name="send_otp">إرسال رمز التفعيل</string>
+    <string name="verify_title">التحقق من الرقم</string>
+    <string name="enter_otp_desc">أدخل الرمز المرسل إلى\n%1$s</string>
+    <string name="otp_label">رمز التحقق</string>
+    <string name="resend_in">إعادة إرسال الرمز خلال %1$d ثانية</string>
+    <string name="resend_now">إعادة إرسال الرمز</string>
+    <string name="change_phone">تعديل رقم الهاتف</string>
+    <string name="complete_profile">إكمال البيانات</string>
+    <string name="welcome_new">أهلاً بك في حسابك الجديد</string>
+    <string name="full_name">الاسم الكامل</string>
+    <string name="create_account">إنشاء الحساب</string>
+    <string name="app_name_ar">ابن الشام</string>
+</resources>

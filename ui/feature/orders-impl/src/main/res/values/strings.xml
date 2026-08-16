@@ -1,0 +1,30 @@
+<resources>
+    <string name="orders_title">My Orders</string>
+    <string name="tab_current">Current</string>
+    <string name="tab_previous">Previous</string>
+    <string name="no_orders">No orders yet</string>
+    <string name="tracking_title">Order Tracking</string>
+    <string name="phase_waiting">Reviewing your order...</string>
+    <string name="phase_waiting_desc">Our team is checking your order details.\nHang tight! 🍽️</string>
+    <string name="phase_confirmed">Order Confirmed!</string>
+    <string name="phase_confirmed_desc">Your order has been confirmed.\nYou can still cancel within the next few minutes.</string>
+    <string name="phase_processing">Your order is being prepared!</string>
+    <string name="phase_processing_desc">Our chef is working on your delicious meal 🍽️</string>
+    <string name="estimated_time">Estimated: ~%1$d min</string>
+    <string name="delivery_check_title">Has your order arrived?</string>
+    <string name="delivery_check_desc">Please confirm when you receive your order</string>
+    <string name="confirm_received">Yes, I received it! ✅</string>
+    <string name="phase_delivered">Order Delivered!</string>
+    <string name="rate_experience">Please rate your experience</string>
+    <string name="thank_you">Thank you!</string>
+    <string name="order_complete">Your order is complete</string>
+    <string name="back_to_orders">Back to Orders</string>
+    <string name="rate_order">Rate your order</string>
+    <string name="how_experience">How was your experience?</string>
+    <string name="skip">Skip</string>
+    <string name="submit">Submit</string>
+    <string name="cancel_order">Cancel Order</string>
+    <string name="order_notes_placeholder">Add a note (optional)</string>
+    <string name="order_cancelled_message">Order cancelled</string>
+    <string name="review_thanks_message">Thanks for your review!</string>
+</resources>

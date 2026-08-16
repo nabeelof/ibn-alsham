@@ -1,0 +1,5 @@
+<resources>
+    <string name="search_products">Search products…</string>
+    <string name="clear">Clear</string>
+    <string name="no_results_for">No results found for \"%s\"</string>
+</resources>

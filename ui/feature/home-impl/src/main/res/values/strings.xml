@@ -1,0 +1,16 @@
+<resources>
+    <string name="home_title">IbnAlsham</string>
+    <string name="notifications">Notifications</string>
+    <string name="categories">Categories</string>
+    <string name="show_as_grid">Show as grid</string>
+    <string name="show_as_tabs">Show as tabs</string>
+    <string name="no_products_category">No products in this category</string>
+    <string name="search_placeholder">Search for products…</string>
+    <string name="view_all">View All</string>
+
+    <!-- Section eyebrows -->
+    <string name="home_browse_eyebrow">Browse</string>
+    <string name="home_offers_eyebrow">Save today</string>
+    <string name="home_popular_eyebrow">Everyone orders</string>
+    <string name="home_chef_eyebrow">Chef picks</string>
+</resources>

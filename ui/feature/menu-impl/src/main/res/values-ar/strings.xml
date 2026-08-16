@@ -1,0 +1,12 @@
+<resources>
+    <string name="menu_title">القائمة</string>
+    <string name="toggle_view">تغيير العرض</string>
+    <string name="cart_summary">%1$d أصناف • %2$s</string>
+    <string name="details">التفاصيل</string>
+    <string name="add">إضافة</string>
+    <string name="items_count">%d أصناف</string>
+    <string name="menu_view_grid">عرض كالشبكة</string>
+    <string name="menu_view_list">عرض كقائمة</string>
+    <string name="menu_empty_title">لا يوجد شيء هنا بعد</string>
+    <string name="menu_empty_message">لا توجد أصناف في هذه الفئة حالياً. جرّب فئة أخرى.</string>
+</resources>

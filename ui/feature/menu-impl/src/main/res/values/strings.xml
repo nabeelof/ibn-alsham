@@ -1,0 +1,12 @@
+<resources>
+    <string name="menu_title">Menu</string>
+    <string name="toggle_view">Toggle View</string>
+    <string name="cart_summary">%1$d Items • %2$s</string>
+    <string name="details">Details</string>
+    <string name="add">Add</string>
+    <string name="items_count">%d Items</string>
+    <string name="menu_view_grid">Show as grid</string>
+    <string name="menu_view_list">Show as list</string>
+    <string name="menu_empty_title">Nothing here yet</string>
+    <string name="menu_empty_message">This category has no dishes right now. Try another one.</string>
+</resources>

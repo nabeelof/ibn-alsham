@@ -1,0 +1,17 @@
+<resources>
+    <string name="login_title">Login</string>
+    <string name="enter_phone_desc">Please enter your phone number to continue</string>
+    <string name="phone_label">Phone Number</string>
+    <string name="send_otp">Send Verification Code</string>
+    <string name="verify_title">Verify Number</string>
+    <string name="enter_otp_desc">Enter the code sent to\n%1$s</string>
+    <string name="otp_label">Verification Code</string>
+    <string name="resend_in">Resend code in %1$d seconds</string>
+    <string name="resend_now">Resend Code</string>
+    <string name="change_phone">Change Phone Number</string>
+    <string name="complete_profile">Complete Profile</string>
+    <string name="welcome_new">Welcome to your new account</string>
+    <string name="full_name">Full Name</string>
+    <string name="create_account">Create Account</string>
+    <string name="app_name_ar">ابن الشام</string>
+</resources>

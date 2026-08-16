@@ -1,0 +1,20 @@
+<resources>
+    <string name="settings_title">الإعدادات</string>
+
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_appearance_eyebrow">الشكل العام</string>
+    <string name="settings_theme_system">النظام</string>
+    <string name="settings_theme_light">فاتح</string>
+    <string name="settings_theme_dark">داكن</string>
+
+    <string name="settings_language">اللغة</string>
+    <string name="settings_language_eyebrow">التفضيلات</string>
+    <string name="settings_language_arabic">العربية</string>
+    <string name="settings_language_english">English</string>
+
+    <string name="settings_about">حول التطبيق</string>
+    <string name="settings_about_eyebrow">معلومات قانونية</string>
+    <string name="settings_privacy">سياسة الخصوصية</string>
+    <string name="settings_terms">شروط الاستخدام</string>
+    <string name="settings_version">الإصدار %1$s</string>
+</resources>

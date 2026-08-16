@@ -1,0 +1,20 @@
+<resources>
+    <string name="settings_title">Settings</string>
+
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_appearance_eyebrow">Look and feel</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+
+    <string name="settings_language">Language</string>
+    <string name="settings_language_eyebrow">Preferences</string>
+    <string name="settings_language_arabic">العربية</string>
+    <string name="settings_language_english">English</string>
+
+    <string name="settings_about">About</string>
+    <string name="settings_about_eyebrow">Legal</string>
+    <string name="settings_privacy">Privacy policy</string>
+    <string name="settings_terms">Terms of use</string>
+    <string name="settings_version">Version %1$s</string>
+</resources>

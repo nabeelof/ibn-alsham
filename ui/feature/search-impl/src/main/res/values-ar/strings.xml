@@ -1,0 +1,5 @@
+<resources>
+    <string name="search_products">ابحث عن منتجات…</string>
+    <string name="clear">مسح</string>
+    <string name="no_results_for">لا توجد نتائج لـ \"%s\"</string>
+</resources>
